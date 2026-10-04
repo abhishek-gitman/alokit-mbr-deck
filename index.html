@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alokit Housing — MBR Apr–Sep 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #0c1220;
+      --bg-slide: #111827;
+      --bg-card: #1a2332;
+      --text: #f4f6f9;
+      --text-muted: #94a3b8;
+      --accent: #c9a227;
+      --accent-soft: rgba(201, 162, 39, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --info: #60a5fa;
+      --border: rgba(148, 163, 184, 0.12);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text);
+    }
+
+    .deck {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    .slide {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem 5rem 4rem;
+      position: relative;
+      background:
+        radial-gradient(ellipse 80% 50% at 100% 0%, rgba(201, 162, 39, 0.08), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 0% 100%, rgba(96, 165, 250, 0.06), transparent 45%),
+        var(--bg-slide);
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 5rem;
+      right: 5rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .kicker {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: clamp(2.5rem, 5vw, 3.75rem);
+      font-weight: 400;
+      line-height: 1.1;
+      max-width: 14ch;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      max-width: 42rem;
+      line-height: 1.6;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .meta-row span strong { color: var(--text); font-weight: 500; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.75rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.5rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-card .value {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-card .delta {
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
+
+    .delta.up { color: var(--success); }
+    .delta.down { color: var(--danger); }
+
+    .stat-card.compare .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .stat-card.compare .compare-tag {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-card.compare .compare-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-card.compare .compare-value.accent { color: var(--accent); }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      table-layout: fixed;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      padding: 0.55rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    table.data-table th:first-child,
+    table.data-table td:first-child {
+      text-align: left;
+      width: 11rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    table.data-table th.num,
+    table.data-table td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.data-table thead th {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    table.data-table thead th:first-child { text-align: left; }
+
+    .card.table-card {
+      max-height: 72vh;
+      margin-top: 1.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    th.num { text-align: right; }
+
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr.highlight td { background: var(--accent-soft); }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      overflow: auto;
+      max-height: 55vh;
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    ul.bullets {
+      list-style: none;
+      margin-top: 1.5rem;
+      max-width: 52rem;
+    }
+
+    ul.bullets li {
+      position: relative;
+      padding-left: 1.35rem;
+      margin-bottom: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    ul.bullets li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    ul.bullets li strong { color: var(--text); }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 48px;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .bar-row .track {
+      height: 8px;
+      background: rgba(148, 163, 184, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-row .fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent), #e8c547);
+    }
+
+    .bar-row .fill.blue { background: linear-gradient(90deg, #3b82f6, var(--info)); }
+    .bar-row .fill.green { background: linear-gradient(90deg, #059669, var(--success)); }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      margin-left: 0.5rem;
+      vertical-align: middle;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav-hint {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      z-index: 100;
+      transition: width 0.2s ease;
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 2rem;
+      right: 5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .title-slide {
+      background:
+        radial-gradient(ellipse 100% 80% at 70% 20%, rgba(201, 162, 39, 0.12), transparent),
+        var(--bg-deep);
+    }
+
+    .title-slide h1 { max-width: none; font-size: clamp(2.75rem, 6vw, 4.25rem); }
+
+    .callout-box {
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      background: var(--bg-card);
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .callout-box strong { color: var(--text); }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      margin-right: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tag.star { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+    .tag.coach { background: rgba(96, 165, 250, 0.15); color: var(--info); }
+    .tag.audit { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+    .tag.warn { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+
+    .hour-chart {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr 3.5rem;
+      gap: 0.5rem 0.75rem;
+      align-items: center;
+      font-size: 0.78rem;
+      margin-top: 0.75rem;
+    }
+
+    .hour-chart .hr-label {
+      color: var(--text-muted);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hour-chart .hr-bar {
+      height: 10px;
+      background: rgba(148, 163, 184, 0.12);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .hour-chart .hr-bar span {
+      display: block;
+      height: 100%;
+      background: var(--info);
+      border-radius: 4px;
+    }
+
+    .hour-chart .hr-bar span.peak { background: var(--accent); }
+
+    .hour-chart .hr-val {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sm-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .sm-filter-row label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .sm-select {
+      flex: 1;
+      min-width: 220px;
+      max-width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .sm-filter-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 2rem 1.5rem 3rem; }
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .slide-num { right: 1.5rem; }
+    }
+
+    @media print {
+      html, body { overflow: visible; height: auto; }
+      .deck { overflow: visible; scroll-snap-type: none; }
+      .slide { page-break-after: always; min-height: auto; padding: 2rem; }
+      .nav-hint, .progress { display: none; }
+    }
+  
+    /* Sticky table headers (all tables in scrollable cards) */
+    .card.table-card { overflow: auto; }
+    table.data-table thead th,
+    .card table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: var(--bg-card);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .deck { padding-top: 3.25rem; }
+    .month-toolbar {
+      position: fixed;
+      top: 3px;
+      left: 0;
+      right: 0;
+      z-index: 110;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem 1rem;
+      padding: 0.45rem 1.25rem;
+      background: rgba(12, 18, 32, 0.94);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      font-size: 0.8rem;
+    }
+    .month-toolbar label { color: var(--text-muted); font-weight: 500; }
+    .month-toolbar select {
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+    }
+    .month-toolbar .hint { color: var(--text-muted); font-size: 0.72rem; margin-left: auto; }
+    @media print {
+      .month-toolbar { display: none; }
+      .deck { padding-top: 0; }
+      table.data-table thead th, .card table thead th { position: static; }
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    th.wins-col-detail, td.wins-col-detail {
+      background: rgba(99, 179, 255, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(99, 179, 255, 0.35);
+    }
+    .month-toolbar label.filter-off { opacity: 0.45; }
+    .month-toolbar select:disabled { opacity: 0.45; cursor: not-allowed; }
+    .filter-mode-detail .compare-grid > div:nth-child(2) { display: none; }
+    .filter-mode-detail .compare-grid { grid-template-columns: 1fr; }
+    .mode-pick { display: inline-flex; gap: 0.25rem; margin-right: 0.75rem; }
+    .mode-btn {
+      font: inherit; font-size: 0.8rem; padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border); border-radius: 6px; background: var(--bg-slide);
+      color: var(--text-muted); cursor: pointer;
+    }
+    .mode-btn.active { color: var(--text); border-color: var(--accent); background: rgba(99, 179, 255, 0.12); }
+    .toolbar-group { display: inline-flex; align-items: center; gap: 0.35rem; margin-right: 0.75rem; }
+    #leadVisitedMomTable .mom-th { line-height: 1.2; white-space: nowrap; }
+    #leadVisitedMomTable .th-mo { display: block; font-weight: 600; }
+    #leadVisitedMomTable .th-sub { display: block; font-size: 0.65rem; font-weight: 400; color: var(--text-muted); }
+    #leadVisitedMomTable .cell-mom { line-height: 1.25; vertical-align: middle; }
+    #leadVisitedMomTable .cell-main { font-weight: 600; }
+    #leadVisitedMomTable .cell-meta {
+      display: block; font-size: 0.68rem; font-weight: 400; color: var(--text-muted); margin-top: 0.1rem;
+    }
+    .lead-visited-mom-card {
+      margin-top: 1rem;
+      max-height: none;
+      overflow: visible;
+    }
+    .lead-visited-mom-card .table-scroll {
+      overflow: auto;
+      max-height: min(38vh, 20rem);
+      margin-top: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .lead-visited-mom-card .data-table { font-size: 0.82rem; }
+    .lead-visited-mom-card .data-table td:first-child,
+    .lead-visited-mom-card .data-table th:first-child { min-width: 7.5rem; }
+
+  </style>
+<script id="mbr-data" type="application/json">{"months":["2026-04","2026-05","2026-06","2026-07","2026-08","2026-09"],"labels":{"2026-04":"Apr 2026","2026-05":"May 2026","2026-06":"Jun 2026","2026-07":"Jul 2026","2026-08":"Aug 2026","2026-09":"Sep 2026"},"kpi":{"new_opps":{"2026-04":3882,"2026-05":4952,"2026-06":4006,"2026-07":2682,"2026-08":7031,"2026-09":4130},"excluded_opps":{"2026-04":5563,"2026-05":69,"2026-06":6586,"2026-07":778,"2026-08":9569,"2026-09":10553},"site_visits":{"2026-04":433,"2026-05":563,"2026-06":537,"2026-07":480,"2026-08":794,"2026-09":245},"wins":{"2026-04":7,"2026-05":14,"2026-06":13,"2026-07":6,"2026-08":19,"2026-09":1},"won_revenue":{"2026-04":16914266.41,"2026-05":60360000,"2026-06":43661600,"2026-07":9260200,"2026-08":52126247.5,"2026-09":3780000},"sarv":{"2026-04":1191,"2026-05":1420,"2026-06":1229,"2026-07":1286,"2026-08":665,"2026-09":378},"outbound_calls":{"2026-04":33957,"2026-05":37050,"2026-06":34416,"2026-07":34891,"2026-08":38890,"2026-09":44834}},"funnel":{"2026-08":[{"stage":"Contacted","cnt":260},{"stage":"Fresh","cnt":9},{"stage":"Opportunity Lost","cnt":2374},{"stage":"Not Contacted","cnt":1700},{"stage":"Contact In Future","cnt":338},{"stage":"Fresh Lead","cnt":755},{"stage":"Opportunity Won","cnt":19},{"stage":"Site Visited","cnt":120},{"stage":"Junk","cnt":1116},{"stage":"Site Visit Shedule","cnt":340}],"2026-04":[{"stage":"Contacted","cnt":55},{"stage":"Opportunity Lost","cnt":1902},{"stage":"Contact In Future","cnt":167},{"stage":"Fresh Lead","cnt":1},{"stage":"Fresh","cnt":2},{"stage":"Opportunity Won","cnt":7},{"stage":"Site Visit Shedule","cnt":58},{"stage":"Junk","cnt":1232},{"stage":"Site Visited","cnt":84},{"stage":"Not Contacted","cnt":374}],"2026-06":[{"stage":"Not Interested","cnt":1},{"stage":"Opportunity Won","cnt":13},{"stage":"Contacted","cnt":151},{"stage":"Fresh","cnt":7},{"stage":"Site Visited","cnt":78},{"stage":"Junk","cnt":885},{"stage":"Site Visit Scheduled","cnt":3},{"stage":"Site Visit Shedule","cnt":157},{"stage":"Opportunity Lost","cnt":1862},{"stage":"Not Contacted","cnt":670},{"stage":"Contact In Future","cnt":175},{"stage":"Fresh Lead","cnt":4}],"2026-05":[{"stage":"Junk","cnt":1119},{"stage":"Opportunity Lost","cnt":2373},{"stage":"Fresh Lead","cnt":19},{"stage":"Contact In Future","cnt":230},{"stage":"Opportunity Won","cnt":14},{"stage":"Site Visited","cnt":86},{"stage":"Fresh","cnt":9},{"stage":"Not Contacted","cnt":761},{"stage":"Contacted","cnt":177},{"stage":"Site Visit Shedule","cnt":164}],"2026-07":[{"stage":"Junk","cnt":526},{"stage":"Site Visit Shedule","cnt":183},{"stage":"Site Visit Scheduled","cnt":1},{"stage":"Contacted","cnt":105},{"stage":"Fresh","cnt":7},{"stage":"Opportunity Won","cnt":6},{"stage":"Site Visited","cnt":100},{"stage":"Opportunity Lost","cnt":1168},{"stage":"Not Contacted","cnt":438},{"stage":"Contact In Future","cnt":128},{"stage":"Fresh Lead","cnt":20}],"2026-09":[{"stage":"Site Visited","cnt":65},{"stage":"Junk","cnt":557},{"stage":"Opportunity Lost","cnt":1301},{"stage":"Not Contacted","cnt":1209},{"stage":"Fresh Lead","cnt":495},{"stage":"Contact In Future","cnt":146},{"stage":"Contacted","cnt":177},{"stage":"Opportunity Won","cnt":1},{"stage":"Site Visit Shedule","cnt":179}]},"leadSource":{"2026-06":[{"source":"Facebook","leads":524,"sched":2,"visited":3,"won":0},{"source":"Website","leads":7,"sched":0,"visited":0,"won":0},{"source":"Ringg","leads":3,"sched":0,"visited":0,"won":0},{"source":"WhatsApp","leads":553,"sched":16,"visited":1,"won":0},{"source":"99acres Brokers","leads":448,"sched":20,"visited":2,"won":0},{"source":"Instagram","leads":2,"sched":0,"visited":2,"won":0},{"source":"Housing","leads":21,"sched":2,"visited":0,"won":0},{"source":"99acres","leads":521,"sched":30,"visited":7,"won":0},{"source":"Google","leads":1,"sched":0,"visited":1,"won":0},{"source":"Magicbricks","leads":561,"sched":13,"visited":4,"won":0},{"source":"Walk In","leads":60,"sched":2,"visited":28,"won":3},{"source":"IVR call","leads":1284,"sched":72,"visited":25,"won":5},{"source":"Partner","leads":21,"sched":0,"visited":5,"won":5}],"2026-05":[{"source":"Facebook","leads":807,"sched":0,"visited":5,"won":0},{"source":"Website","leads":9,"sched":0,"visited":0,"won":0},{"source":"WhatsApp","leads":918,"sched":11,"visited":2,"won":0},{"source":"99acres Brokers","leads":426,"sched":21,"visited":0,"won":0},{"source":"Instagram","leads":6,"sched":0,"visited":4,"won":0},{"source":"99acres","leads":624,"sched":33,"visited":4,"won":0},{"source":"Housing","leads":207,"sched":5,"visited":2,"won":0},{"source":"IVR call","leads":1348,"sched":87,"visited":23,"won":4},{"source":"Partner","leads":25,"sched":0,"visited":9,"won":4},{"source":"Walk In","leads":80,"sched":1,"visited":34,"won":6},{"source":"(blank)","leads":1,"sched":0,"visited":0,"won":0},{"source":"Webform ARG Ananta","leads":21,"sched":0,"visited":0,"won":0},{"source":"Magicbricks","leads":480,"sched":6,"visited":3,"won":0}],"2026-08":[{"source":"Website Alokitplots","leads":18,"sched":1,"visited":0,"won":0},{"source":"Walk In","leads":65,"sched":4,"visited":42,"won":1},{"source":"Webform ARG Ananta","leads":4,"sched":0,"visited":0,"won":0},{"source":"Aavas_Whatsapp","leads":4,"sched":0,"visited":4,"won":0},{"source":"99acres","leads":519,"sched":50,"visited":6,"won":0},{"source":"Housing","leads":85,"sched":3,"visited":0,"won":0},{"source":"Facebook","leads":1260,"sched":17,"visited":0,"won":0},{"source":"Website","leads":25,"sched":0,"visited":0,"won":0},{"source":"IVR call","leads":2732,"sched":188,"visited":47,"won":14},{"source":"Partner","leads":11,"sched":1,"visited":7,"won":1},{"source":"Cold Call","leads":2,"sched":0,"visited":1,"won":0},{"source":"Ringg","leads":1,"sched":0,"visited":1,"won":0},{"source":"Magicbricks","leads":723,"sched":34,"visited":6,"won":1},{"source":"99acres Brokers","leads":241,"sched":16,"visited":2,"won":0},{"source":"WhatsApp","leads":1327,"sched":26,"visited":2,"won":2},{"source":"Picky Assist","leads":12,"sched":0,"visited":0,"won":0},{"source":"Instagram","leads":2,"sched":0,"visited":2,"won":0}],"2026-09":[{"source":"WhatsApp","leads":790,"sched":21,"visited":2,"won":0},{"source":"99acres Brokers","leads":169,"sched":9,"visited":2,"won":0},{"source":"99acres","leads":260,"sched":18,"visited":1,"won":0},{"source":"Housing","leads":80,"sched":3,"visited":0,"won":0},{"source":"Facebook","leads":568,"sched":9,"visited":1,"won":0},{"source":"Website","leads":1,"sched":0,"visited":1,"won":0},{"source":"Magicbricks","leads":229,"sched":7,"visited":1,"won":0},{"source":"IVR call","leads":1963,"sched":101,"visited":10,"won":0},{"source":"Partner","leads":5,"sched":4,"visited":0,"won":0},{"source":"Webform ARG Ananta","leads":2,"sched":0,"visited":0,"won":0},{"source":"Walk In","leads":62,"sched":7,"visited":47,"won":1},{"source":"Website Alokitplots","leads":1,"sched":0,"visited":0,"won":0}],"2026-07":[{"source":"IVR call","leads":1017,"sched":71,"visited":22,"won":3},{"source":"Partner","leads":13,"sched":0,"visited":7,"won":0},{"source":"Picky Assist","leads":16,"sched":0,"visited":0,"won":0},{"source":"Facebook","leads":134,"sched":0,"visited":1,"won":0},{"source":"Website","leads":7,"sched":0,"visited":0,"won":0},{"source":"Housing","leads":77,"sched":6,"visited":2,"won":0},{"source":"99acres","leads":439,"sched":48,"visited":3,"won":1},{"source":"Magicbricks","leads":278,"sched":14,"visited":1,"won":0},{"source":"Ringg","leads":1,"sched":0,"visited":0,"won":0},{"source":"Google Ads","leads":1,"sched":0,"visited":1,"won":0},{"source":"WhatsApp","leads":344,"sched":17,"visited":3,"won":0},{"source":"99acres Brokers","leads":269,"sched":22,"visited":0,"won":0},{"source":"Walk In","leads":85,"sched":5,"visited":59,"won":2},{"source":"Instagram","leads":1,"sched":0,"visited":1,"won":0}],"2026-04":[{"source":"Housing","leads":118,"sched":1,"visited":0,"won":0},{"source":"Aavas_Whatsapp","leads":1,"sched":0,"visited":1,"won":0},{"source":"99acres Brokers","leads":232,"sched":2,"visited":1,"won":0},{"source":"Instagram","leads":475,"sched":3,"visited":1,"won":0},{"source":"WhatsApp","leads":426,"sched":9,"visited":1,"won":0},{"source":"Walk In","leads":76,"sched":0,"visited":41,"won":3},{"source":"IVR call","leads":1069,"sched":29,"visited":19,"won":1},{"source":"Partner","leads":13,"sched":0,"visited":4,"won":3},{"source":"Facebook","leads":660,"sched":1,"visited":4,"won":0},{"source":"Website","leads":66,"sched":0,"visited":0,"won":0},{"source":"Magicbricks","leads":378,"sched":0,"visited":4,"won":0},{"source":"Google AdWords","leads":2,"sched":0,"visited":1,"won":0},{"source":"Meta Ads","leads":1,"sched":0,"visited":0,"won":0},{"source":"99acres","leads":341,"sched":13,"visited":7,"won":0},{"source":"Webform ARG Ananta","leads":24,"sched":0,"visited":0,"won":0}]},"callOwners":{"2026-04":[{"owner":"Shivam","calls":922,"talk_min":170,"interested":60,"not_int":123,"no_resp":655},{"owner":"Anand","calls":920,"talk_min":219,"interested":192,"not_int":396,"no_resp":44},{"owner":"Harshit Jain","calls":2506,"talk_min":259,"interested":253,"not_int":477,"no_resp":1761},{"owner":"Lokendra","calls":193,"talk_min":37,"interested":11,"not_int":110,"no_resp":61},{"owner":"Ankit Sikarwar","calls":2873,"talk_min":411,"interested":140,"not_int":424,"no_resp":2180},{"owner":"Shivam Agarwal","calls":2269,"talk_min":318,"interested":97,"not_int":705,"no_resp":1218},{"owner":"Mayank Saraswat","calls":1881,"talk_min":179,"interested":66,"not_int":1372,"no_resp":435},{"owner":"Dharampal","calls":2204,"talk_min":238,"interested":61,"not_int":314,"no_resp":1496},{"owner":"Sambhav Tiwari","calls":2446,"talk_min":376,"interested":54,"not_int":753,"no_resp":1504},{"owner":"Mukul Upadhyay","calls":2265,"talk_min":433,"interested":122,"not_int":516,"no_resp":1343},{"owner":"Honey","calls":1960,"talk_min":274,"interested":39,"not_int":409,"no_resp":1441},{"owner":"Dilip Kumar","calls":2417,"talk_min":146,"interested":28,"not_int":681,"no_resp":1568},{"owner":"Ankit Sharma","calls":718,"talk_min":107,"interested":28,"not_int":145,"no_resp":481},{"owner":"Vivek Gautam","calls":1940,"talk_min":212,"interested":191,"not_int":316,"no_resp":1338},{"owner":"Ankit Singh","calls":2353,"talk_min":277,"interested":78,"not_int":440,"no_resp":1596},{"owner":"Yash","calls":2945,"talk_min":438,"interested":129,"not_int":734,"no_resp":1769},{"owner":"Digendra Singh","calls":2535,"talk_min":143,"interested":30,"not_int":414,"no_resp":1941},{"owner":"Ashwani Lall","calls":610,"talk_min":216,"interested":3,"not_int":195,"no_resp":237}],"2026-05":[{"owner":"Ashwani Lall","calls":713,"talk_min":296,"interested":30,"not_int":200,"no_resp":269},{"owner":"Dilip Kumar","calls":3127,"talk_min":236,"interested":26,"not_int":814,"no_resp":1986},{"owner":"Yash","calls":2823,"talk_min":408,"interested":137,"not_int":672,"no_resp":1747},{"owner":"Digendra Singh","calls":2353,"talk_min":225,"interested":79,"not_int":614,"no_resp":1513},{"owner":"Ankit Singh","calls":2661,"talk_min":483,"interested":166,"not_int":559,"no_resp":1648},{"owner":"Ankit Sharma","calls":1542,"talk_min":254,"interested":85,"not_int":333,"no_resp":1020},{"owner":"Mayank Saraswat","calls":2393,"talk_min":352,"interested":134,"not_int":1526,"no_resp":716},{"owner":"Sambhav Tiwari","calls":2324,"talk_min":386,"interested":58,"not_int":649,"no_resp":1491},{"owner":"Anand","calls":1177,"talk_min":297,"interested":173,"not_int":472,"no_resp":201},{"owner":"Dharampal","calls":2579,"talk_min":371,"interested":73,"not_int":655,"no_resp":1508},{"owner":"Honey","calls":1916,"talk_min":257,"interested":62,"not_int":335,"no_resp":1453},{"owner":"Mukul Upadhyay","calls":2090,"talk_min":537,"interested":162,"not_int":408,"no_resp":1277},{"owner":"Harshit Jain","calls":2653,"talk_min":266,"interested":209,"not_int":511,"no_resp":1911},{"owner":"Lokendra","calls":452,"talk_min":111,"interested":39,"not_int":191,"no_resp":201},{"owner":"Vivek Gautam","calls":1899,"talk_min":186,"interested":245,"not_int":203,"no_resp":1290},{"owner":"Ankit Sikarwar","calls":1371,"talk_min":148,"interested":76,"not_int":166,"no_resp":1097},{"owner":"Shivam Agarwal","calls":2667,"talk_min":451,"interested":175,"not_int":960,"no_resp":1298},{"owner":"Shivam","calls":2310,"talk_min":564,"interested":125,"not_int":494,"no_resp":1423}],"2026-06":[{"owner":"Harshit Jain","calls":2530,"talk_min":264,"interested":234,"not_int":458,"no_resp":1818},{"owner":"Sambhav Tiwari","calls":2417,"talk_min":410,"interested":75,"not_int":718,"no_resp":1502},{"owner":"Lokendra","calls":542,"talk_min":151,"interested":46,"not_int":240,"no_resp":229},{"owner":"Anand","calls":191,"talk_min":41,"interested":23,"not_int":96,"no_resp":25},{"owner":"Mayank Saraswat","calls":2042,"talk_min":252,"interested":100,"not_int":1069,"no_resp":848},{"owner":"Vivek Gautam","calls":2073,"talk_min":264,"interested":163,"not_int":523,"no_resp":1267},{"owner":"Mukul Upadhyay","calls":2283,"talk_min":403,"interested":191,"not_int":498,"no_resp":1378},{"owner":"Jitendra","calls":276,"talk_min":73,"interested":30,"not_int":129,"no_resp":87},{"owner":"Honey","calls":2013,"talk_min":282,"interested":70,"not_int":370,"no_resp":1503},{"owner":"Ashwani Lall","calls":804,"talk_min":326,"interested":27,"not_int":247,"no_resp":347},{"owner":"Shivam Agarwal","calls":2150,"talk_min":404,"interested":196,"not_int":641,"no_resp":1143},{"owner":"Ankit Sharma","calls":1823,"talk_min":419,"interested":152,"not_int":528,"no_resp":1012},{"owner":"Yash","calls":2684,"talk_min":394,"interested":177,"not_int":629,"no_resp":1685},{"owner":"Digendra Singh","calls":2449,"talk_min":145,"interested":35,"not_int":357,"no_resp":1950},{"owner":"Dilip Kumar","calls":2810,"talk_min":163,"interested":13,"not_int":810,"no_resp":1783},{"owner":"Shivam","calls":2266,"talk_min":479,"interested":91,"not_int":457,"no_resp":1558},{"owner":"Dharampal","calls":2557,"talk_min":325,"interested":44,"not_int":497,"no_resp":1604},{"owner":"Ankit Singh","calls":2506,"talk_min":515,"interested":146,"not_int":520,"no_resp":1551}],"2026-07":[{"owner":"Lokendra","calls":1100,"talk_min":247,"interested":63,"not_int":322,"no_resp":591},{"owner":"Ashwani Lall","calls":1413,"talk_min":424,"interested":18,"not_int":356,"no_resp":546},{"owner":"Shivam","calls":2198,"talk_min":330,"interested":36,"not_int":493,"no_resp":1549},{"owner":"Mayank Saraswat","calls":2311,"talk_min":335,"interested":104,"not_int":883,"no_resp":1247},{"owner":"Sambhav Tiwari","calls":2014,"talk_min":316,"interested":68,"not_int":559,"no_resp":1300},{"owner":"Shivam Agarwal","calls":2307,"talk_min":451,"interested":134,"not_int":779,"no_resp":1202},{"owner":"Jitendra","calls":496,"talk_min":111,"interested":35,"not_int":225,"no_resp":155},{"owner":"Ankit Sharma","calls":478,"talk_min":87,"interested":39,"not_int":112,"no_resp":238},{"owner":"Yash","calls":2931,"talk_min":462,"interested":174,"not_int":584,"no_resp":1795},{"owner":"Dilip Kumar","calls":2787,"talk_min":251,"interested":16,"not_int":805,"no_resp":1795},{"owner":"Digendra Singh","calls":2640,"talk_min":247,"interested":73,"not_int":391,"no_resp":1994},{"owner":"Dharampal","calls":2414,"talk_min":468,"interested":115,"not_int":330,"no_resp":1490},{"owner":"Harshit Jain","calls":2506,"talk_min":284,"interested":408,"not_int":205,"no_resp":1890},{"owner":"Mukul Upadhyay","calls":2302,"talk_min":469,"interested":183,"not_int":510,"no_resp":1405},{"owner":"Vivek Gautam","calls":2301,"talk_min":324,"interested":62,"not_int":807,"no_resp":1315},{"owner":"Ankit Singh","calls":2715,"talk_min":489,"interested":133,"not_int":454,"no_resp":1916},{"owner":"Honey","calls":1978,"talk_min":258,"interested":70,"not_int":364,"no_resp":1426}],"2026-08":[{"owner":"Dharampal","calls":2551,"talk_min":472,"interested":108,"not_int":347,"no_resp":1673},{"owner":"Ankit Singh","calls":2513,"talk_min":490,"interested":217,"not_int":345,"no_resp":1715},{"owner":"Om Prakash","calls":490,"talk_min":103,"interested":17,"not_int":84,"no_resp":349},{"owner":"Mayank Saraswat","calls":1870,"talk_min":489,"interested":109,"not_int":746,"no_resp":970},{"owner":"Vivek Gautam","calls":1861,"talk_min":343,"interested":173,"not_int":423,"no_resp":1186},{"owner":"Mukul Upadhyay","calls":2343,"talk_min":500,"interested":171,"not_int":385,"no_resp":1358},{"owner":"Jitendra","calls":605,"talk_min":169,"interested":49,"not_int":266,"no_resp":209},{"owner":"Harshit Jain","calls":2077,"talk_min":168,"interested":161,"not_int":163,"no_resp":1750},{"owner":"Suraj Jadwani","calls":824,"talk_min":245,"interested":28,"not_int":447,"no_resp":282},{"owner":"Shivam","calls":2049,"talk_min":365,"interested":61,"not_int":433,"no_resp":1424},{"owner":"Satvik Garg","calls":1688,"talk_min":510,"interested":4,"not_int":431,"no_resp":861},{"owner":"Honey","calls":1911,"talk_min":244,"interested":35,"not_int":327,"no_resp":1433},{"owner":"Yash Jain","calls":669,"talk_min":169,"interested":32,"not_int":211,"no_resp":332},{"owner":"Hitesh Devgan","calls":963,"talk_min":242,"interested":28,"not_int":257,"no_resp":513},{"owner":"Lokendra","calls":925,"talk_min":281,"interested":108,"not_int":243,"no_resp":478},{"owner":"Sambhav Tiwari","calls":2447,"talk_min":671,"interested":109,"not_int":596,"no_resp":1573},{"owner":"Yash","calls":2983,"talk_min":463,"interested":199,"not_int":557,"no_resp":1796},{"owner":"Ankit Sharma","calls":1441,"talk_min":480,"interested":220,"not_int":321,"no_resp":753},{"owner":"Digendra Singh","calls":2436,"talk_min":275,"interested":85,"not_int":344,"no_resp":1847},{"owner":"Dilip Kumar","calls":2796,"talk_min":272,"interested":40,"not_int":745,"no_resp":1830},{"owner":"Shivam Agarwal","calls":2251,"talk_min":457,"interested":131,"not_int":781,"no_resp":1164},{"owner":"Ashwani Lall","calls":1197,"talk_min":517,"interested":81,"not_int":361,"no_resp":537}],"2026-09":[{"owner":"Mukul Upadhyay","calls":2203,"talk_min":468,"interested":129,"not_int":410,"no_resp":1498},{"owner":"Vivek Gautam","calls":2396,"talk_min":484,"interested":202,"not_int":653,"no_resp":1417},{"owner":"Jitendra","calls":186,"talk_min":46,"interested":2,"not_int":98,"no_resp":63},{"owner":"Satvik Garg","calls":4204,"talk_min":802,"interested":41,"not_int":812,"no_resp":2841},{"owner":"Mayank Saraswat","calls":1695,"talk_min":221,"interested":57,"not_int":852,"no_resp":748},{"owner":"Ashwani Lall","calls":1069,"talk_min":328,"interested":47,"not_int":378,"no_resp":500},{"owner":"Shivam Agarwal","calls":2049,"talk_min":388,"interested":116,"not_int":518,"no_resp":1221},{"owner":"Suraj Jadwani","calls":1374,"talk_min":451,"interested":41,"not_int":633,"no_resp":571},{"owner":"Harshit Jain","calls":1691,"talk_min":156,"interested":121,"not_int":361,"no_resp":1198},{"owner":"Digendra Singh","calls":2620,"talk_min":349,"interested":46,"not_int":625,"no_resp":1732},{"owner":"Yash","calls":2748,"talk_min":470,"interested":132,"not_int":609,"no_resp":1622},{"owner":"Ankit Sharma","calls":1231,"talk_min":332,"interested":181,"not_int":271,"no_resp":605},{"owner":"Dilip Kumar","calls":2668,"talk_min":276,"interested":30,"not_int":578,"no_resp":1929},{"owner":"Shivam","calls":2051,"talk_min":223,"interested":22,"not_int":367,"no_resp":1538},{"owner":"Lokendra","calls":510,"talk_min":144,"interested":53,"not_int":150,"no_resp":229},{"owner":"Sambhav Tiwari","calls":2267,"talk_min":580,"interested":68,"not_int":484,"no_resp":1557},{"owner":"Dharampal","calls":2770,"talk_min":324,"interested":64,"not_int":429,"no_resp":1898},{"owner":"Ankit Singh","calls":2518,"talk_min":389,"interested":126,"not_int":398,"no_resp":1785},{"owner":"Om Prakash","calls":1903,"talk_min":343,"interested":64,"not_int":353,"no_resp":1328},{"owner":"Honey","calls":1882,"talk_min":245,"interested":44,"not_int":357,"no_resp":1409},{"owner":"Yash Jain","calls":2661,"talk_min":546,"interested":138,"not_int":594,"no_resp":1531},{"owner":"Hitesh Devgan","calls":2138,"talk_min":733,"interested":163,"not_int":564,"no_resp":1080}]},"oppOwners":{"2026-06":[{"owner":"Sambhav Tiwari","sched":0,"visited":2,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Lokendra","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Harshit Jain","sched":27,"visited":11,"sv_in_month":13,"wins":3,"won_revenue":12975000.0},{"owner":"Ankit Singh","sched":23,"visited":6,"sv_in_month":17,"wins":0,"won_revenue":0.0},{"owner":"Dharampal","sched":12,"visited":4,"sv_in_month":8,"wins":0,"won_revenue":0.0},{"owner":"Jitendra","sched":22,"visited":1,"sv_in_month":17,"wins":0,"won_revenue":0.0},{"owner":"Mukul Upadhyay","sched":34,"visited":3,"sv_in_month":17,"wins":0,"won_revenue":0.0},{"owner":"Vivek Gautam","sched":0,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Honey","sched":15,"visited":6,"sv_in_month":0,"wins":2,"won_revenue":6050000.0},{"owner":"Shivam Agarwal","sched":1,"visited":17,"sv_in_month":0,"wins":2,"won_revenue":18600.0},{"owner":"Ashwani Lall","sched":6,"visited":6,"sv_in_month":5,"wins":0,"won_revenue":0.0},{"owner":"Mayank Saraswat","sched":6,"visited":6,"sv_in_month":5,"wins":0,"won_revenue":0.0},{"owner":"Yash","sched":3,"visited":0,"sv_in_month":3,"wins":3,"won_revenue":13797000.0},{"owner":"Digendra Singh","sched":7,"visited":10,"sv_in_month":1,"wins":3,"won_revenue":10821000.0},{"owner":"Dilip Kumar","sched":0,"visited":3,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Shivam","sched":1,"visited":2,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Jayant Tuli","sched":0,"visited":0,"sv_in_month":135,"wins":0,"won_revenue":0.0}],"2026-07":[{"owner":"Sambhav Tiwari","sched":0,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Lokendra","sched":1,"visited":8,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Ashwani Lall","sched":4,"visited":0,"sv_in_month":3,"wins":1,"won_revenue":100000.0},{"owner":"Jitendra","sched":20,"visited":5,"sv_in_month":15,"wins":0,"won_revenue":0.0},{"owner":"Jayant Tuli","sched":0,"visited":1,"sv_in_month":121,"wins":0,"won_revenue":0.0},{"owner":"Digendra Singh","sched":14,"visited":22,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Yash","sched":10,"visited":0,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Dilip Kumar","sched":0,"visited":33,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Mayank Saraswat","sched":9,"visited":3,"sv_in_month":7,"wins":0,"won_revenue":0.0},{"owner":"Shivam","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Dharampal","sched":29,"visited":5,"sv_in_month":28,"wins":0,"won_revenue":0.0},{"owner":"Harshit Jain","sched":31,"visited":13,"sv_in_month":13,"wins":2,"won_revenue":9125000.0},{"owner":"Shivam Agarwal","sched":5,"visited":4,"sv_in_month":4,"wins":3,"won_revenue":35200.0},{"owner":"Ankit Singh","sched":15,"visited":1,"sv_in_month":12,"wins":0,"won_revenue":0.0},{"owner":"Mukul Upadhyay","sched":32,"visited":4,"sv_in_month":26,"wins":0,"won_revenue":0.0},{"owner":"Honey","sched":13,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0}],"2026-05":[{"owner":"Jayant Tuli","sched":0,"visited":0,"sv_in_month":203,"wins":0,"won_revenue":0.0},{"owner":"Ashwani Lall","sched":4,"visited":15,"sv_in_month":4,"wins":0,"won_revenue":0.0},{"owner":"Shivam Agarwal","sched":0,"visited":7,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Dharampal","sched":2,"visited":1,"sv_in_month":3,"wins":3,"won_revenue":26040000.0},{"owner":"Om Prakash","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Honey","sched":12,"visited":2,"sv_in_month":0,"wins":1,"won_revenue":9060000.0},{"owner":"Mayank Saraswat","sched":5,"visited":5,"sv_in_month":3,"wins":0,"won_revenue":0.0},{"owner":"Mukul Upadhyay","sched":28,"visited":2,"sv_in_month":12,"wins":0,"won_revenue":0.0},{"owner":"Jitendra","sched":2,"visited":8,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Sambhav Tiwari","sched":0,"visited":3,"sv_in_month":0,"wins":5,"won_revenue":9000000.0},{"owner":"Digendra Singh","sched":15,"visited":12,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Ankit Singh","sched":49,"visited":4,"sv_in_month":28,"wins":3,"won_revenue":9009000.0},{"owner":"Yash","sched":0,"visited":0,"sv_in_month":0,"wins":2,"won_revenue":7251000.0},{"owner":"Dilip Kumar","sched":0,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Vivek Gautam","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Lokendra","sched":3,"visited":4,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Harshit Jain","sched":29,"visited":19,"sv_in_month":18,"wins":0,"won_revenue":0.0},{"owner":"Shivam","sched":15,"visited":3,"sv_in_month":5,"wins":0,"won_revenue":0.0}],"2026-04":[{"owner":"Mayank Saraswat","sched":1,"visited":3,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Shivam","sched":1,"visited":5,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Lokendra","sched":1,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Harshit Jain","sched":5,"visited":18,"sv_in_month":17,"wins":3,"won_revenue":2500066.41},{"owner":"Ankit Singh","sched":16,"visited":4,"sv_in_month":6,"wins":1,"won_revenue":5313200.0},{"owner":"Digendra Singh","sched":8,"visited":23,"sv_in_month":0,"wins":1,"won_revenue":2651000.0},{"owner":"Yash","sched":0,"visited":0,"sv_in_month":0,"wins":2,"won_revenue":6450000.0},{"owner":"Sambhav Tiwari","sched":0,"visited":6,"sv_in_month":3,"wins":0,"won_revenue":0.0},{"owner":"Mukul Upadhyay","sched":14,"visited":0,"sv_in_month":2,"wins":0,"won_revenue":0.0},{"owner":"Jitendra","sched":0,"visited":9,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Jayant Tuli","sched":0,"visited":0,"sv_in_month":122,"wins":0,"won_revenue":0.0},{"owner":"Honey","sched":8,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Dharampal","sched":0,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Om Prakash","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Shivam Agarwal","sched":0,"visited":9,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Dilip Kumar","sched":0,"visited":2,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Ashwani Lall","sched":4,"visited":3,"sv_in_month":2,"wins":0,"won_revenue":0.0}],"2026-09":[{"owner":"Mayank Saraswat","sched":11,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Vivek Gautam","sched":3,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Jitendra","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Mukul Upadhyay","sched":35,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Yash Jain","sched":2,"visited":2,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Honey","sched":12,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Shivam Agarwal","sched":11,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Ashwani Lall","sched":2,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Harshit Jain","sched":11,"visited":10,"sv_in_month":10,"wins":0,"won_revenue":0.0},{"owner":"Satvik Garg","sched":1,"visited":2,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Ankit Sharma","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Digendra Singh","sched":9,"visited":13,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Dilip Kumar","sched":0,"visited":27,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Yash","sched":41,"visited":3,"sv_in_month":0,"wins":1,"won_revenue":3780000.0},{"owner":"Lokendra","sched":1,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Sambhav Tiwari","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Ankit Singh","sched":20,"visited":2,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Dharampal","sched":17,"visited":1,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Om Prakash","sched":0,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Shivam","sched":3,"visited":0,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Jayant Tuli","sched":0,"visited":0,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Hitesh Devgan","sched":0,"visited":4,"sv_in_month":0,"wins":0,"won_revenue":0.0}],"2026-08":[{"owner":"Harshit Jain","sched":35,"visited":14,"sv_in_month":47,"wins":5,"won_revenue":17151047.5},{"owner":"Dharampal","sched":11,"visited":3,"sv_in_month":11,"wins":0,"won_revenue":0.0},{"owner":"Ankit Singh","sched":46,"visited":6,"sv_in_month":37,"wins":1,"won_revenue":10500.0},{"owner":"Mayank Saraswat","sched":32,"visited":5,"sv_in_month":29,"wins":0,"won_revenue":0.0},{"owner":"Yash","sched":31,"visited":1,"sv_in_month":6,"wins":2,"won_revenue":8180000.0},{"owner":"Digendra Singh","sched":19,"visited":34,"sv_in_month":6,"wins":7,"won_revenue":24815000.0},{"owner":"Ankit Sharma","sched":1,"visited":0,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Dilip Kumar","sched":9,"visited":20,"sv_in_month":4,"wins":0,"won_revenue":0.0},{"owner":"Jayant Tuli","sched":0,"visited":0,"sv_in_month":180,"wins":0,"won_revenue":0.0},{"owner":"Shivam","sched":2,"visited":2,"sv_in_month":3,"wins":0,"won_revenue":0.0},{"owner":"Mukul Upadhyay","sched":88,"visited":3,"sv_in_month":69,"wins":0,"won_revenue":0.0},{"owner":"Vivek Gautam","sched":0,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Jitendra","sched":33,"visited":0,"sv_in_month":28,"wins":0,"won_revenue":0.0},{"owner":"Hitesh Devgan","sched":0,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Sambhav Tiwari","sched":0,"visited":5,"sv_in_month":1,"wins":1,"won_revenue":1940000.0},{"owner":"Lokendra","sched":1,"visited":8,"sv_in_month":1,"wins":0,"won_revenue":0.0},{"owner":"Honey","sched":9,"visited":1,"sv_in_month":0,"wins":0,"won_revenue":0.0},{"owner":"Shivam Agarwal","sched":13,"visited":9,"sv_in_month":6,"wins":3,"won_revenue":29700.0},{"owner":"Ashwani Lall","sched":10,"visited":7,"sv_in_month":9,"wins":0,"won_revenue":0.0}]},"flash":{"2026-04":[{"owner":"Mayank Saraswat","calls":1881,"flash":1443,"zero_talk":1216,"off_hours":0},{"owner":"Dharampal","calls":2204,"flash":1831,"zero_talk":1705,"off_hours":15},{"owner":"Ankit Sikarwar","calls":2873,"flash":2228,"zero_talk":2056,"off_hours":10},{"owner":"Shivam Agarwal","calls":2269,"flash":1650,"zero_talk":1472,"off_hours":9},{"owner":"Vivek Gautam","calls":1940,"flash":1551,"zero_talk":1437,"off_hours":31},{"owner":"Sambhav Tiwari","calls":2446,"flash":1721,"zero_talk":1651,"off_hours":157},{"owner":"Shivam","calls":922,"flash":711,"zero_talk":623,"off_hours":6},{"owner":"Anand","calls":920,"flash":667,"zero_talk":404,"off_hours":55},{"owner":"Harshit Jain","calls":2506,"flash":1998,"zero_talk":1817,"off_hours":1},{"owner":"Lokendra","calls":193,"flash":140,"zero_talk":133,"off_hours":0},{"owner":"Dilip Kumar","calls":2417,"flash":2163,"zero_talk":1820,"off_hours":10},{"owner":"Ankit Sharma","calls":718,"flash":539,"zero_talk":512,"off_hours":5},{"owner":"Ashwani Lall","calls":610,"flash":348,"zero_talk":327,"off_hours":11},{"owner":"Honey","calls":1960,"flash":1438,"zero_talk":1329,"off_hours":3},{"owner":"Ankit Singh","calls":2353,"flash":1836,"zero_talk":1711,"off_hours":23},{"owner":"Yash","calls":2945,"flash":2131,"zero_talk":2027,"off_hours":15},{"owner":"Digendra Singh","calls":2535,"flash":2206,"zero_talk":1975,"off_hours":36},{"owner":"Mukul Upadhyay","calls":2265,"flash":1613,"zero_talk":1435,"off_hours":25}],"2026-06":[{"owner":"Sambhav Tiwari","calls":2417,"flash":1675,"zero_talk":1609,"off_hours":54},{"owner":"Lokendra","calls":542,"flash":354,"zero_talk":329,"off_hours":2},{"owner":"Anand","calls":191,"flash":98,"zero_talk":77,"off_hours":17},{"owner":"Mayank Saraswat","calls":2042,"flash":1562,"zero_talk":1364,"off_hours":0},{"owner":"Vivek Gautam","calls":2073,"flash":1360,"zero_talk":1299,"off_hours":47},{"owner":"Mukul Upadhyay","calls":2283,"flash":1669,"zero_talk":1475,"off_hours":18},{"owner":"Jitendra","calls":276,"flash":166,"zero_talk":144,"off_hours":0},{"owner":"Honey","calls":2013,"flash":1499,"zero_talk":1345,"off_hours":2},{"owner":"Harshit Jain","calls":2530,"flash":2037,"zero_talk":1818,"off_hours":6},{"owner":"Ankit Sharma","calls":1823,"flash":1183,"zero_talk":1056,"off_hours":14},{"owner":"Yash","calls":2684,"flash":2008,"zero_talk":1929,"off_hours":15},{"owner":"Digendra Singh","calls":2449,"flash":2126,"zero_talk":1939,"off_hours":29},{"owner":"Dilip Kumar","calls":2810,"flash":2362,"zero_talk":2040,"off_hours":6},{"owner":"Shivam","calls":2266,"flash":1594,"zero_talk":1434,"off_hours":15},{"owner":"Dharampal","calls":2557,"flash":1946,"zero_talk":1736,"off_hours":32},{"owner":"Ankit Singh","calls":2506,"flash":1721,"zero_talk":1622,"off_hours":35},{"owner":"Ashwani Lall","calls":804,"flash":463,"zero_talk":422,"off_hours":19},{"owner":"Shivam Agarwal","calls":2150,"flash":1482,"zero_talk":1335,"off_hours":14}],"2026-07":[{"owner":"Sambhav Tiwari","calls":2014,"flash":1431,"zero_talk":1367,"off_hours":1},{"owner":"Shivam Agarwal","calls":2307,"flash":1655,"zero_talk":1509,"off_hours":8},{"owner":"Shivam","calls":2198,"flash":1622,"zero_talk":1430,"off_hours":6},{"owner":"Mayank Saraswat","calls":2311,"flash":1867,"zero_talk":1647,"off_hours":1},{"owner":"Ankit Singh","calls":2715,"flash":1976,"zero_talk":1850,"off_hours":25},{"owner":"Jitendra","calls":496,"flash":308,"zero_talk":288,"off_hours":0},{"owner":"Lokendra","calls":1100,"flash":742,"zero_talk":687,"off_hours":7},{"owner":"Ashwani Lall","calls":1413,"flash":870,"zero_talk":806,"off_hours":38},{"owner":"Mukul Upadhyay","calls":2302,"flash":1572,"zero_talk":1410,"off_hours":13},{"owner":"Vivek Gautam","calls":2301,"flash":1406,"zero_talk":1254,"off_hours":14},{"owner":"Honey","calls":1978,"flash":1525,"zero_talk":1402,"off_hours":4},{"owner":"Dharampal","calls":2414,"flash":1890,"zero_talk":1737,"off_hours":50},{"owner":"Harshit Jain","calls":2506,"flash":2094,"zero_talk":1911,"off_hours":7},{"owner":"Ankit Sharma","calls":478,"flash":327,"zero_talk":291,"off_hours":26},{"owner":"Yash","calls":2931,"flash":2110,"zero_talk":2047,"off_hours":30},{"owner":"Dilip Kumar","calls":2787,"flash":2289,"zero_talk":2091,"off_hours":24},{"owner":"Digendra Singh","calls":2640,"flash":2207,"zero_talk":2003,"off_hours":10}],"2026-08":[{"owner":"Harshit Jain","calls":2077,"flash":1797,"zero_talk":1658,"off_hours":8},{"owner":"Suraj Jadwani","calls":824,"flash":348,"zero_talk":312,"off_hours":2},{"owner":"Shivam","calls":2049,"flash":1459,"zero_talk":1258,"off_hours":3},{"owner":"Vivek Gautam","calls":1861,"flash":1241,"zero_talk":1184,"off_hours":19},{"owner":"Mukul Upadhyay","calls":2343,"flash":1688,"zero_talk":1514,"off_hours":9},{"owner":"Jitendra","calls":605,"flash":375,"zero_talk":333,"off_hours":0},{"owner":"Hitesh Devgan","calls":963,"flash":629,"zero_talk":550,"off_hours":7},{"owner":"Sambhav Tiwari","calls":2447,"flash":1677,"zero_talk":1625,"off_hours":32},{"owner":"Lokendra","calls":925,"flash":595,"zero_talk":536,"off_hours":6},{"owner":"Ankit Singh","calls":2513,"flash":1847,"zero_talk":1705,"off_hours":19},{"owner":"Dharampal","calls":2551,"flash":1996,"zero_talk":1784,"off_hours":10},{"owner":"Om Prakash","calls":490,"flash":333,"zero_talk":297,"off_hours":0},{"owner":"Mayank Saraswat","calls":1870,"flash":1454,"zero_talk":1289,"off_hours":0},{"owner":"Honey","calls":1911,"flash":1468,"zero_talk":1349,"off_hours":12},{"owner":"Yash Jain","calls":669,"flash":409,"zero_talk":369,"off_hours":4},{"owner":"Shivam Agarwal","calls":2251,"flash":1625,"zero_talk":1462,"off_hours":14},{"owner":"Ashwani Lall","calls":1197,"flash":715,"zero_talk":643,"off_hours":7},{"owner":"Satvik Garg","calls":1688,"flash":1095,"zero_talk":966,"off_hours":5},{"owner":"Ankit Sharma","calls":1441,"flash":883,"zero_talk":773,"off_hours":7},{"owner":"Dilip Kumar","calls":2796,"flash":2279,"zero_talk":2074,"off_hours":9},{"owner":"Digendra Singh","calls":2436,"flash":1983,"zero_talk":1795,"off_hours":29},{"owner":"Yash","calls":2983,"flash":2175,"zero_talk":2081,"off_hours":34}],"2026-09":[{"owner":"Mayank Saraswat","calls":1695,"flash":1331,"zero_talk":1130,"off_hours":0},{"owner":"Sambhav Tiwari","calls":2267,"flash":1618,"zero_talk":1573,"off_hours":23},{"owner":"Lokendra","calls":510,"flash":342,"zero_talk":306,"off_hours":11},{"owner":"Satvik Garg","calls":4204,"flash":3090,"zero_talk":2678,"off_hours":9},{"owner":"Ankit Singh","calls":2518,"flash":1898,"zero_talk":1753,"off_hours":8},{"owner":"Dharampal","calls":2770,"flash":2237,"zero_talk":1996,"off_hours":9},{"owner":"Om Prakash","calls":1903,"flash":1432,"zero_talk":1268,"off_hours":2},{"owner":"Shivam Agarwal","calls":2049,"flash":1467,"zero_talk":1314,"off_hours":11},{"owner":"Ashwani Lall","calls":1069,"flash":641,"zero_talk":595,"off_hours":10},{"owner":"Mukul Upadhyay","calls":2203,"flash":1575,"zero_talk":1386,"off_hours":17},{"owner":"Vivek Gautam","calls":2396,"flash":1480,"zero_talk":1386,"off_hours":10},{"owner":"Jitendra","calls":186,"flash":112,"zero_talk":100,"off_hours":0},{"owner":"Shivam","calls":2051,"flash":1586,"zero_talk":1390,"off_hours":3},{"owner":"Hitesh Devgan","calls":2138,"flash":1367,"zero_talk":1204,"off_hours":13},{"owner":"Yash","calls":2748,"flash":1952,"zero_talk":1835,"off_hours":18},{"owner":"Digendra Singh","calls":2620,"flash":1873,"zero_talk":1688,"off_hours":6},{"owner":"Dilip Kumar","calls":2668,"flash":2160,"zero_talk":1979,"off_hours":18},{"owner":"Ankit Sharma","calls":1231,"flash":775,"zero_talk":674,"off_hours":16},{"owner":"Honey","calls":1882,"flash":1383,"zero_talk":1209,"off_hours":12},{"owner":"Yash Jain","calls":2661,"flash":1877,"zero_talk":1716,"off_hours":14},{"owner":"Suraj Jadwani","calls":1374,"flash":677,"zero_talk":588,"off_hours":0},{"owner":"Harshit Jain","calls":1691,"flash":1327,"zero_talk":1167,"off_hours":2}],"2026-05":[{"owner":"Sambhav Tiwari","calls":2324,"flash":1616,"zero_talk":1551,"off_hours":119},{"owner":"Anand","calls":1177,"flash":780,"zero_talk":592,"off_hours":65},{"owner":"Dilip Kumar","calls":3127,"flash":2575,"zero_talk":2259,"off_hours":42},{"owner":"Yash","calls":2823,"flash":2058,"zero_talk":1967,"off_hours":12},{"owner":"Digendra Singh","calls":2353,"flash":1845,"zero_talk":1554,"off_hours":22},{"owner":"Ankit Singh","calls":2661,"flash":1905,"zero_talk":1759,"off_hours":23},{"owner":"Ankit Sharma","calls":1542,"flash":1128,"zero_talk":1044,"off_hours":3},{"owner":"Mayank Saraswat","calls":2393,"flash":1698,"zero_talk":1443,"off_hours":0},{"owner":"Vivek Gautam","calls":1899,"flash":1556,"zero_talk":1457,"off_hours":106},{"owner":"Dharampal","calls":2579,"flash":1868,"zero_talk":1682,"off_hours":58},{"owner":"Ashwani Lall","calls":713,"flash":425,"zero_talk":388,"off_hours":20},{"owner":"Harshit Jain","calls":2653,"flash":2109,"zero_talk":1895,"off_hours":2},{"owner":"Lokendra","calls":452,"flash":339,"zero_talk":325,"off_hours":0},{"owner":"Shivam","calls":2310,"flash":1579,"zero_talk":1457,"off_hours":8},{"owner":"Mukul Upadhyay","calls":2090,"flash":1461,"zero_talk":1332,"off_hours":38},{"owner":"Ankit Sikarwar","calls":1371,"flash":1124,"zero_talk":1023,"off_hours":1},{"owner":"Shivam Agarwal","calls":2667,"flash":1824,"zero_talk":1629,"off_hours":12},{"owner":"Honey","calls":1916,"flash":1427,"zero_talk":1303,"off_hours":3}]},"callResults":{"2026-06":[{"result":"Interested","cnt":1813},{"result":"Not interested","cnt":8787},{"result":"Requested call back","cnt":113},{"result":"Requested more info","cnt":112},{"result":"(blank)","cnt":2009},{"result":"Invalid number","cnt":292},{"result":"No response/Busy","cnt":21290}],"2026-07":[{"result":"Interested","cnt":1731},{"result":"Requested more info","cnt":142},{"result":"No response/Busy","cnt":21854},{"result":"Requested call back","cnt":88},{"result":"Not interested","cnt":8179},{"result":"(blank)","cnt":2596},{"result":"Invalid number","cnt":301}],"2026-05":[{"result":"No response/Busy","cnt":22049},{"result":"Not interested","cnt":9762},{"result":"Interested","cnt":2054},{"result":"Invalid number","cnt":280},{"result":"Requested call back","cnt":123},{"result":"(blank)","cnt":2625},{"result":"Requested more info","cnt":157}],"2026-09":[{"result":"Invalid number","cnt":969},{"result":"Requested more info","cnt":237},{"result":"(blank)","cnt":2795},{"result":"No response/Busy","cnt":28300},{"result":"Requested call back","cnt":152},{"result":"Not interested","cnt":10494},{"result":"Interested","cnt":1887}],"2026-04":[{"result":"Requested call back","cnt":124},{"result":"Requested more info","cnt":123},{"result":"(blank)","cnt":2263},{"result":"Invalid number","cnt":273},{"result":"Not interested","cnt":8524},{"result":"No response/Busy","cnt":21068},{"result":"Interested","cnt":1582}],"2026-08":[{"result":"Requested call back","cnt":158},{"result":"Invalid number","cnt":549},{"result":"No response/Busy","cnt":24033},{"result":"Interested","cnt":2166},{"result":"Requested more info","cnt":269},{"result":"(blank)","cnt":2902},{"result":"Not interested","cnt":8813}]},"teamHourly":{"2026-04":[39,2269,10771,5137,1912,2922,3015,3315,3528,637],"2026-05":[71,2535,10763,5301,2209,3299,4071,4469,3222,576],"2026-06":[43,1621,9126,5472,2059,3119,3728,4424,3425,1074],"2026-07":[31,1036,8677,5806,2410,2835,3645,4957,4106,1124],"2026-08":[48,1942,9601,6213,2765,3138,3960,5093,4397,1497],"2026-09":[59,2274,9463,7296,4016,4409,4957,5889,4825,1434]},"hourlyByMonth":{"2026-04":{},"2026-05":{},"2026-06":{},"2026-07":{},"2026-08":{"Ankit Sharma":[1,183,460,301,150,124,84,90,34,7],"Ankit Singh":[12,163,633,406,189,185,317,361,214,26],"Ashwani Lall":[0,77,204,240,172,130,98,160,98,11],"Dharampal":[1,311,667,343,193,158,254,305,272,37],"Digendra Singh":[0,152,873,341,23,54,131,410,267,156],"Dilip Kumar":[0,16,780,547,112,112,183,451,366,220],"Harshit Jain":[1,24,535,364,5,69,218,283,373,197],"Hitesh Devgan":[0,71,145,167,113,72,83,164,127,14],"Honey":[2,59,532,297,91,179,178,245,219,97],"Jitendra":[3,22,160,83,69,100,79,60,29,0],"Lokendra":[2,20,265,195,94,79,100,117,41,12],"Mayank Saraswat":[0,107,329,195,80,209,248,279,278,145],"Mukul Upadhyay":[3,147,727,376,335,245,216,114,163,8],"Om Prakash":[0,59,88,64,23,56,91,94,11,4],"Sambhav Tiwari":[0,44,537,373,60,123,163,338,538,240],"Satvik Garg":[1,97,231,228,159,255,266,190,204,52],"Shivam":[0,35,334,298,245,102,263,399,325,45],"Shivam Agarwal":[2,81,543,280,127,260,344,421,146,33],"Suraj Jadwani":[0,100,275,265,182,237,155,166,164,33],"Vivek Gautam":[12,114,454,261,107,106,176,205,338,69],"Yash":[7,81,810,612,257,344,328,284,158,68],"Yash Jain":[1,29,146,107,80,53,63,47,102,37]},"2026-09":{"Ankit Sharma":[7,181,322,358,91,78,98,46,18,16],"Ankit Singh":[16,202,726,251,184,318,259,370,172,12],"Ashwani Lall":[0,40,220,232,179,138,72,96,69,13],"Dharampal":[1,423,700,248,248,190,378,366,175,32],"Digendra Singh":[4,50,868,306,36,31,151,378,545,245],"Dilip Kumar":[0,34,622,669,37,183,286,271,379,169],"Harshit Jain":[0,16,449,333,4,35,64,200,348,240],"Hitesh Devgan":[0,188,332,322,262,281,312,244,165,19],"Honey":[3,52,383,208,133,194,218,254,271,154],"Jitendra":[0,1,19,29,56,20,20,5,36,0],"Lokendra":[4,9,122,93,67,57,18,41,87,1],"Mayank Saraswat":[0,25,248,285,75,86,217,313,367,79],"Mukul Upadhyay":[3,176,499,306,290,277,265,202,141,27],"Om Prakash":[0,222,544,232,235,204,181,162,111,10],"Sambhav Tiwari":[2,25,338,421,67,136,220,425,456,154],"Satvik Garg":[8,147,480,827,542,554,628,526,394,89],"Shivam":[3,29,217,226,317,121,293,510,320,12],"Shivam Agarwal":[1,56,320,291,108,148,278,660,164,12],"Suraj Jadwani":[0,98,295,272,231,233,151,54,38,2],"Vivek Gautam":[2,123,478,355,111,273,246,327,389,82],"Yash":[4,79,771,469,271,402,330,274,81,49],"Yash Jain":[1,98,510,563,472,450,272,165,99,17]}},"efficiency":{"2026-04":{"calls":33957,"talk_min":4453,"connect_pct":29.8,"interested_pct":4.7,"flash_pct":77.2,"talk_min_per_call":0.13,"dials_per_opp":8.7,"sarv_per_opp":0.31,"sv_rate":11.2,"win_rate":0.18,"data_hygiene_pct":58.9},"2026-05":{"calls":37050,"talk_min":5828,"connect_pct":31.9,"interested_pct":5.5,"flash_pct":73.7,"talk_min_per_call":0.16,"dials_per_opp":7.5,"sarv_per_opp":0.29,"sv_rate":11.4,"win_rate":0.28,"data_hygiene_pct":1.4},"2026-06":{"calls":34416,"talk_min":5310,"connect_pct":30.8,"interested_pct":5.3,"flash_pct":73.5,"talk_min_per_call":0.15,"dials_per_opp":8.6,"sarv_per_opp":0.31,"sv_rate":13.4,"win_rate":0.32,"data_hygiene_pct":62.2},"2026-07":{"calls":34891,"talk_min":5553,"connect_pct":28.4,"interested_pct":5.0,"flash_pct":74.2,"talk_min_per_call":0.16,"dials_per_opp":13.0,"sarv_per_opp":0.48,"sv_rate":17.9,"win_rate":0.22,"data_hygiene_pct":22.5},"2026-08":{"calls":38890,"talk_min":7925,"connect_pct":28.2,"interested_pct":5.6,"flash_pct":72.2,"talk_min_per_call":0.2,"dials_per_opp":5.5,"sarv_per_opp":0.09,"sv_rate":11.3,"win_rate":0.27,"data_hygiene_pct":57.6},"2026-09":{"calls":44834,"talk_min":8298,"connect_pct":27.6,"interested_pct":4.2,"flash_pct":71.8,"talk_min_per_call":0.19,"dials_per_opp":10.9,"sarv_per_opp":0.09,"sv_rate":5.9,"win_rate":0.02,"data_hygiene_pct":71.9}},"hourLabels":["9 AM","10 AM","11 AM","12 PM","1 PM","2 PM","3 PM","4 PM","5 PM","6 PM"],"winsMom":{"owners":["Harshit Jain","Digendra Singh","Yash","Shivam Agarwal","Sambhav Tiwari","Ankit Singh","Dharampal","Honey","Ashwani Lall"],"wins":{"Harshit Jain":{"2026-04":3,"2026-05":0,"2026-06":3,"2026-07":2,"2026-08":5,"2026-09":0},"Digendra Singh":{"2026-04":1,"2026-05":0,"2026-06":3,"2026-07":0,"2026-08":7,"2026-09":0},"Yash":{"2026-04":2,"2026-05":2,"2026-06":3,"2026-07":0,"2026-08":2,"2026-09":1},"Shivam Agarwal":{"2026-04":0,"2026-05":0,"2026-06":2,"2026-07":3,"2026-08":3,"2026-09":0},"Sambhav Tiwari":{"2026-04":0,"2026-05":5,"2026-06":0,"2026-07":0,"2026-08":1,"2026-09":0},"Ankit Singh":{"2026-04":1,"2026-05":3,"2026-06":0,"2026-07":0,"2026-08":1,"2026-09":0},"Dharampal":{"2026-04":0,"2026-05":3,"2026-06":0,"2026-07":0,"2026-08":0,"2026-09":0},"Honey":{"2026-04":0,"2026-05":1,"2026-06":2,"2026-07":0,"2026-08":0,"2026-09":0},"Ashwani Lall":{"2026-04":0,"2026-05":0,"2026-06":0,"2026-07":1,"2026-08":0,"2026-09":0}},"revenue":{"Harshit Jain":{"2026-04":2500066.41,"2026-05":0.0,"2026-06":12975000.0,"2026-07":9125000.0,"2026-08":17151047.5,"2026-09":0.0},"Digendra Singh":{"2026-04":2651000.0,"2026-05":0.0,"2026-06":10821000.0,"2026-07":0.0,"2026-08":24815000.0,"2026-09":0.0},"Yash":{"2026-04":6450000.0,"2026-05":7251000.0,"2026-06":13797000.0,"2026-07":0.0,"2026-08":8180000.0,"2026-09":3780000.0},"Shivam Agarwal":{"2026-04":0.0,"2026-05":0.0,"2026-06":18600.0,"2026-07":35200.0,"2026-08":29700.0,"2026-09":0.0},"Sambhav Tiwari":{"2026-04":0.0,"2026-05":9000000.0,"2026-06":0.0,"2026-07":0.0,"2026-08":1940000.0,"2026-09":0.0},"Ankit Singh":{"2026-04":5313200.0,"2026-05":9009000.0,"2026-06":0.0,"2026-07":0.0,"2026-08":10500.0,"2026-09":0.0},"Dharampal":{"2026-04":0.0,"2026-05":26040000.0,"2026-06":0.0,"2026-07":0.0,"2026-08":0.0,"2026-09":0.0},"Honey":{"2026-04":0.0,"2026-05":9060000.0,"2026-06":6050000.0,"2026-07":0.0,"2026-08":0.0,"2026-09":0.0},"Ashwani Lall":{"2026-04":0.0,"2026-05":0.0,"2026-06":0.0,"2026-07":100000.0,"2026-08":0.0,"2026-09":0.0}}},"leadSourceVisitedMom":{"sources":["Walk In","IVR call","Partner","99acres","Magicbricks","Facebook","WhatsApp","Instagram","99acres Brokers","Aavas_Whatsapp","Housing","Cold Call","Google","Google AdWords"],"visited":{"Walk In":{"2026-04":41,"2026-05":34,"2026-06":28,"2026-07":59,"2026-08":42,"2026-09":47},"IVR call":{"2026-04":19,"2026-05":23,"2026-06":25,"2026-07":22,"2026-08":47,"2026-09":10},"Partner":{"2026-04":4,"2026-05":9,"2026-06":5,"2026-07":7,"2026-08":7,"2026-09":0},"99acres":{"2026-04":7,"2026-05":4,"2026-06":7,"2026-07":3,"2026-08":6,"2026-09":1},"Magicbricks":{"2026-04":4,"2026-05":3,"2026-06":4,"2026-07":1,"2026-08":6,"2026-09":1},"Facebook":{"2026-04":4,"2026-05":5,"2026-06":3,"2026-07":1,"2026-08":0,"2026-09":1},"WhatsApp":{"2026-04":1,"2026-05":2,"2026-06":1,"2026-07":3,"2026-08":2,"2026-09":2},"Instagram":{"2026-04":1,"2026-05":4,"2026-06":2,"2026-07":1,"2026-08":2,"2026-09":0},"99acres Brokers":{"2026-04":1,"2026-05":0,"2026-06":2,"2026-07":0,"2026-08":2,"2026-09":2},"Aavas_Whatsapp":{"2026-04":1,"2026-05":0,"2026-06":0,"2026-07":0,"2026-08":4,"2026-09":0},"Housing":{"2026-04":0,"2026-05":2,"2026-06":0,"2026-07":2,"2026-08":0,"2026-09":0},"Cold Call":{"2026-04":0,"2026-05":0,"2026-06":0,"2026-07":0,"2026-08":1,"2026-09":0},"Google":{"2026-04":0,"2026-05":0,"2026-06":1,"2026-07":0,"2026-08":0,"2026-09":0},"Google AdWords":{"2026-04":1,"2026-05":0,"2026-06":0,"2026-07":0,"2026-08":0,"2026-09":0}},"leads":{"Walk In":{"2026-04":76,"2026-05":80,"2026-06":60,"2026-07":85,"2026-08":65,"2026-09":62},"IVR call":{"2026-04":1069,"2026-05":1348,"2026-06":1284,"2026-07":1017,"2026-08":2732,"2026-09":1963},"Partner":{"2026-04":13,"2026-05":25,"2026-06":21,"2026-07":13,"2026-08":11,"2026-09":5},"99acres":{"2026-04":341,"2026-05":624,"2026-06":521,"2026-07":439,"2026-08":519,"2026-09":260},"Magicbricks":{"2026-04":378,"2026-05":480,"2026-06":561,"2026-07":278,"2026-08":723,"2026-09":229},"Facebook":{"2026-04":660,"2026-05":807,"2026-06":524,"2026-07":134,"2026-08":1260,"2026-09":568},"WhatsApp":{"2026-04":426,"2026-05":918,"2026-06":553,"2026-07":344,"2026-08":1327,"2026-09":790},"Instagram":{"2026-04":475,"2026-05":6,"2026-06":2,"2026-07":1,"2026-08":2,"2026-09":0},"99acres Brokers":{"2026-04":232,"2026-05":426,"2026-06":448,"2026-07":269,"2026-08":241,"2026-09":169},"Aavas_Whatsapp":{"2026-04":1,"2026-05":0,"2026-06":0,"2026-07":0,"2026-08":4,"2026-09":0},"Housing":{"2026-04":118,"2026-05":207,"2026-06":21,"2026-07":77,"2026-08":85,"2026-09":80},"Cold Call":{"2026-04":0,"2026-05":0,"2026-06":0,"2026-07":0,"2026-08":2,"2026-09":0},"Google":{"2026-04":0,"2026-05":0,"2026-06":1,"2026-07":0,"2026-08":0,"2026-09":0},"Google AdWords":{"2026-04":2,"2026-05":0,"2026-06":0,"2026-07":0,"2026-08":0,"2026-09":0}},"monthTotals":{"2026-04":{"visited":84,"leads":3882},"2026-05":{"visited":86,"leads":4952},"2026-06":{"visited":78,"leads":4006},"2026-07":{"visited":100,"leads":2682},"2026-08":{"visited":120,"leads":7031},"2026-09":{"visited":65,"leads":4130}}}}</script>
+</head>
+<body>
+  
+  <div class="month-toolbar" role="region" aria-label="Month filters">
+    <span class="mode-pick" role="group" aria-label="Filter mode">
+      <button type="button" class="mode-btn active" id="useDetailMode" aria-pressed="true">Detail month</button>
+      <button type="button" class="mode-btn" id="useCompareMode" aria-pressed="false">Compare A vs B</button>
+    </span>
+    <span id="compareGroup" class="toolbar-group">
+      <label for="compareMonthA">Compare A</label>
+      <select id="compareMonthA"></select>
+      <span style="color:var(--text-muted)">vs</span>
+      <label for="compareMonthB">Compare B</label>
+      <select id="compareMonthB"></select>
+    </span>
+    <span id="detailGroup" class="toolbar-group">
+      <label for="detailMonth">Month</label>
+      <select id="detailMonth"></select>
+    </span>
+    <span class="hint" id="filterModeHint">Detail mode: all cards show the selected month only.</span>
+  </div>
+
+  <div class="progress" id="progress" style="width: 0%"></div>
+  <div class="nav-hint">↓ scroll or <kbd style="padding:2px 6px;border:1px solid var(--border);border-radius:4px">PgDn</kbd></div>
+
+  <div class="deck" id="deck">
+
+    <section class="slide title-slide">
+      <span class="slide-num">01 / 20</span>
+      <p class="kicker">Monthly Business Review</p>
+      <h1>Alokit Housing</h1>
+      <p class="subtitle">Sales &amp; marketing performance for <strong>April–September 2026</strong> — opportunities, Sarv inbound, and sales outbound activity (IST).</p>
+      <div class="meta-row">
+        <span><strong>Period:</strong> 1 Apr – 30 Sep 2026 (IST)</span>
+        <span><strong>Source:</strong> Zoho CRM Analytics</span>
+        <span><strong>Filter:</strong> Ab_others empty (opportunities)</span>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">02 / 20</span>
+      <p class="kicker">Executive summary</p>
+      <h2>Six-month arc · September snapshot</h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.88rem">Apr–Sep filtered new opps: <strong>26,683</strong> · peak <strong>Aug</strong> (7,031) · MoM cards: <strong>Aug vs Sep</strong></p>
+      <div class="grid-3">
+        <div class="stat-card compare" data-cmp-kpi="new_opps" data-cmp-fmt="num">
+          <div class="label">New opportunities</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">7,031</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">4,130</span></div>
+          </div>
+          <div class="delta" data-cmp-delta down">-41% MoM</div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="sarv" data-cmp-fmt="num">
+          <div class="label">Sarv inbound calls</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">665</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">378</span></div>
+          </div>
+          <div class="delta" data-cmp-delta down">-43% MoM</div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="outbound_calls" data-cmp-fmt="num">
+          <div class="label">SM outbound calls</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">38,890</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">44,834</span></div>
+          </div>
+          <div class="delta" data-cmp-delta up">+15% MoM</div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="site_visits" data-cmp-fmt="num">
+          <div class="label">Site visits (month)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">794</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">245</span></div>
+          </div>
+          <div class="delta" data-cmp-delta down">-69% MoM · Ab_others empty</div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="wins" data-cmp-fmt="num">
+          <div class="label">Total wins (cohort)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">19</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">1</span></div>
+          </div>
+          <div class="delta" data-cmp-delta down">Month-created cohort · filtered</div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="won_revenue" data-cmp-fmt="inr">
+          <div class="label">Booked value (cohort wins)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">₹5.21 Cr</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">₹37.8 L</span></div>
+          </div>
+          <div class="delta">Sum of Amount · Won stage</div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li id="exec-excluded-note"><strong>10,553</strong> September opportunities excluded where <strong>Ab_others</strong> was populated (9,569 in August).</li>
+        <li>Outbound volume rose in September while filtered lead volume and site visits softened after the August peak.</li>
+        <li>Main constraint: <strong>connectivity</strong> (~63% outbound = no response / busy in September).</li>
+      </ul>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">03 / 20</span>
+      <p class="kicker">Trend</p>
+      <h2>Monthly volume · Apr–Sep 2026</h2>
+      <div class="grid-2">
+        <div class="card table-card" style="max-height:none">
+          <h3>6-month series (filtered opps · Jayant excluded on calls)</h3>
+          <table class="data-table">
+            <thead><tr><th>Month</th><th class="num">New opps</th><th class="num">Sarv</th><th class="num">Outbound</th><th class="num">Site visits</th><th class="num">Wins</th></tr></thead>
+            <tbody><tr><td>Apr 2026</td><td class="num">3,882</td><td class="num">1,191</td><td class="num">33,957</td><td class="num">433</td><td class="num">7</td></tr>
+<tr><td>May 2026</td><td class="num">4,952</td><td class="num">1,420</td><td class="num">37,050</td><td class="num">563</td><td class="num">14</td></tr>
+<tr><td>Jun 2026</td><td class="num">4,006</td><td class="num">1,229</td><td class="num">34,416</td><td class="num">537</td><td class="num">13</td></tr>
+<tr><td>Jul 2026</td><td class="num">2,682</td><td class="num">1,286</td><td class="num">34,891</td><td class="num">480</td><td class="num">6</td></tr>
+<tr><td>Aug 2026</td><td class="num">7,031</td><td class="num">665</td><td class="num">38,890</td><td class="num">794</td><td class="num">19</td></tr>
+<tr><td>Sep 2026</td><td class="num">4,130</td><td class="num">378</td><td class="num">44,834</td><td class="num">245</td><td class="num">1</td></tr>
+</tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>September vs 6-month context</h3>
+          <div class="bar-row"><span>Sep opps</span><div class="track"><div class="fill" style="width:59%"></div></div><span class="num">4,130</span></div>
+          <div class="bar-row"><span>Aug peak</span><div class="track"><div class="fill" style="width:100%;opacity:0.55"></div></div><span class="num">7,031</span></div>
+          <div class="bar-row"><span>Sep outbound</span><div class="track"><div class="fill blue" style="width:100%"></div></div><span class="num">44,834</span></div>
+          <div class="bar-row"><span>Sep Sarv</span><div class="track"><div class="fill green" style="width:27%"></div></div><span class="num">378</span></div>
+          <table style="margin-top:1rem">
+            <tr><td>Outbound calls per new opp (Sep)</td><td class="num"><strong>10.9</strong></td></tr>
+            <tr><td>Sarv per new opp (Sep)</td><td class="num">0.09</td></tr>
+            <tr><td>Site visits / new opps (Sep)</td><td class="num">5.9%</td></tr>
+            <tr><td>Talk time (outbound Sep)</td><td class="num">~138 hours</td></tr>
+            <tr><td>Top lead source (Sep cohort)</td><td class="num">IVR (1,963)</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">04 / 20</span>
+      <p class="kicker">Pipeline</p>
+      <h2>Opportunity funnel <span class="pill">Ab_others empty</span></h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.88rem"><strong><span data-detail-month-label>Sep 2026</span> created</strong> cohort (4,130 records) · current stage distribution</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3><span data-detail-month-label>Sep 2026</span> cohort by current stage</h3>
+          <table class="data-table">
+            <thead><tr><th>Stage</th><th class="num">Count</th><th class="num">Share</th></tr></thead>
+            <tbody id="funnelBody"><tr><td>Opportunity Lost</td><td class="num">1,301</td><td class="num">31.5%</td></tr>
+<tr><td>Not Contacted</td><td class="num">1,209</td><td class="num">29.3%</td></tr>
+<tr><td>Junk</td><td class="num">557</td><td class="num">13.5%</td></tr>
+<tr><td>Fresh Lead</td><td class="num">495</td><td class="num">12.0%</td></tr>
+<tr><td>Site Visit Shedule</td><td class="num">179</td><td class="num">4.3%</td></tr>
+<tr><td>Contacted</td><td class="num">177</td><td class="num">4.3%</td></tr>
+<tr><td>Contact In Future</td><td class="num">146</td><td class="num">3.5%</td></tr>
+<tr class="highlight"><td>Site Visited</td><td class="num">65</td><td class="num">1.6%</td></tr>
+<tr class="highlight"><td>Opportunity Won</td><td class="num">1</td><td class="num">0.0%</td></tr>
+</tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Top lead sources (<span data-detail-month-label>Sep 2026</span> volume)</h3>
+          <div id="leadSourceBars"><div class="bar-row"><span>IVR call</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="num">1,963</span></div>
+<div class="bar-row"><span>WhatsApp</span><div class="track"><div class="fill" style="width:40%"></div></div><span class="num">790</span></div>
+<div class="bar-row"><span>Facebook</span><div class="track"><div class="fill" style="width:29%"></div></div><span class="num">568</span></div>
+<div class="bar-row"><span>99acres</span><div class="track"><div class="fill" style="width:13%"></div></div><span class="num">260</span></div>
+<div class="bar-row"><span>Magicbricks</span><div class="track"><div class="fill" style="width:12%"></div></div><span class="num">229</span></div>
+</div>
+        </div>
+      </div>
+      <div class="card table-card lead-visited-mom-card">
+        <h3>Site visited customers · month on month by lead source</h3>
+        <p class="subtitle" style="margin-top:0.35rem;font-size:0.85rem">Cohort reached <strong>Site Visited</strong>. Each cell: <strong>visited</strong> with <span style="color:var(--text-muted)">(total leads · % visited)</span> — use this to decide where to shift marketing budget.</p>
+        <div class="table-scroll">
+          <table class="data-table" id="leadVisitedMomTable">
+            <thead><tr><th>Lead source</th><th class="num mom-th" data-mom-col="2026-04"><span class="th-mo">Apr</span><span class="th-sub">visited (leads)</span></th><th class="num mom-th" data-mom-col="2026-05"><span class="th-mo">May</span><span class="th-sub">visited (leads)</span></th><th class="num mom-th" data-mom-col="2026-06"><span class="th-mo">Jun</span><span class="th-sub">visited (leads)</span></th><th class="num mom-th" data-mom-col="2026-07"><span class="th-mo">Jul</span><span class="th-sub">visited (leads)</span></th><th class="num mom-th" data-mom-col="2026-08"><span class="th-mo">Aug</span><span class="th-sub">visited (leads)</span></th><th class="num mom-th" data-mom-col="2026-09"><span class="th-mo">Sep</span><span class="th-sub">visited (leads)</span></th><th class="num">Total</th></tr></thead>
+            <tbody id="leadVisitedMomBody"></tbody>
+            <tfoot><tr><td><strong>All sources</strong></td><td class="num" id="leadVisitedFoot-2026-04">—</td><td class="num" id="leadVisitedFoot-2026-05">—</td><td class="num" id="leadVisitedFoot-2026-06">—</td><td class="num" id="leadVisitedFoot-2026-07">—</td><td class="num" id="leadVisitedFoot-2026-08">—</td><td class="num" id="leadVisitedFoot-2026-09">—</td><td class="num" id="leadVisitedFoot-total">—</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">05 / 20</span>
+      <p class="kicker">Conversion</p>
+      <h2>Lead source → site visit → win</h2>
+      <p class="subtitle" style="margin-top:0.5rem"><span data-detail-month-label>Sep 2026</span>-created opportunities · stages Site Visit Shedule &amp; Site Visited · Ab_others empty</p>
+      <div class="card table-card" style="max-height:none">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Lead source</th><th class="num">Leads</th><th class="num">Sched.</th><th class="num">Visited</th><th class="num">Won</th>
+              <th class="num">Sched %</th><th class="num">Visited %</th><th class="num">Win %</th>
+            </tr>
+          </thead>
+          <tbody id="leadSourceBody"><tr class="highlight"><td>IVR call</td><td class="num">1,963</td><td class="num">101</td><td class="num">10</td><td class="num">0</td><td class="num">5.1%</td><td class="num">0.5%</td><td class="num">0.00%</td></tr>
+<tr><td>WhatsApp</td><td class="num">790</td><td class="num">21</td><td class="num">2</td><td class="num">0</td><td class="num">2.7%</td><td class="num">0.3%</td><td class="num">0.00%</td></tr>
+<tr><td>Facebook</td><td class="num">568</td><td class="num">9</td><td class="num">1</td><td class="num">0</td><td class="num">1.6%</td><td class="num">0.2%</td><td class="num">0.00%</td></tr>
+<tr><td>99acres</td><td class="num">260</td><td class="num">18</td><td class="num">1</td><td class="num">0</td><td class="num">6.9%</td><td class="num">0.4%</td><td class="num">0.00%</td></tr>
+<tr><td>Magicbricks</td><td class="num">229</td><td class="num">7</td><td class="num">1</td><td class="num">0</td><td class="num">3.1%</td><td class="num">0.4%</td><td class="num">0.00%</td></tr>
+<tr><td>99acres Brokers</td><td class="num">169</td><td class="num">9</td><td class="num">2</td><td class="num">0</td><td class="num">5.3%</td><td class="num">1.2%</td><td class="num">0.00%</td></tr>
+<tr><td>Walk In</td><td class="num">62</td><td class="num">7</td><td class="num">47</td><td class="num">1</td><td class="num">11.3%</td><td class="num">75.8%</td><td class="num">1.61%</td></tr>
+</tbody>
+        </table>
+      </div>
+      <ul class="bullets">
+        <li><strong>IVR</strong> still drives volume (1,963 Sep leads) but win conversion is muted (0%).</li>
+        <li><strong>Walk In</strong> retains the highest visit rate on a smaller base (47 visits / 62 leads).</li>
+        <li><strong>99acres Brokers</strong> shows stronger visit depth than core 99acres — worth routing tests.</li>
+      </ul>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">06 / 20</span>
+      <p class="kicker">Telephony</p>
+      <h2>Sarv inbound calls</h2>
+      <div class="grid-3">
+        <div class="stat-card compare" data-cmp-kpi="sarv" data-cmp-fmt="num">
+          <div class="label">Sarv inbound volume</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">665</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">378</span></div>
+          </div>
+          <div class="delta down">-43% MoM</div>
+        </div>
+        <div class="stat-card"><div class="label">Apr–Sep total</div><div class="value" style="font-size:1.4rem">6,169</div></div>
+        <div class="stat-card"><div class="label">September daily avg</div><div class="value">~13</div></div>
+      </div>
+      <ul class="bullets">
+        <li>Sarv trend: <strong>1,191</strong> (Apr) → <strong>378</strong> (Sep); down <strong>-43% MoM</strong> vs August.</li>
+        <li>Pair Sarv with <strong>1,963 IVR-sourced</strong> September opportunities for the inbound story.</li>
+        <li>Review marketing mix and IVR routing with client — inbound softness continues post-August peak.</li>
+      </ul>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">07 / 20</span>
+      <p class="kicker">Calls module</p>
+      <h2>Sales outbound overview</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Call results <span data-detail-month-label>Sep 2026</span></h3>
+          <div id="callResultsBars"><div class="bar-row"><span>No response/Busy</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="num">28,300</span></div>
+<div class="bar-row"><span>Not interested</span><div class="track"><div class="fill" style="width:37%"></div></div><span class="num">10,494</span></div>
+<div class="bar-row"><span>(blank)</span><div class="track"><div class="fill" style="width:10%"></div></div><span class="num">2,795</span></div>
+<div class="bar-row"><span>Interested</span><div class="track"><div class="fill" style="width:7%"></div></div><span class="num">1,887</span></div>
+
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="outbound_calls" data-cmp-fmt="num" style="display:flex;flex-direction:column;justify-content:center">
+          <div class="label">Outbound calls (compare)</div>
+          <div class="compare-grid" style="margin-top:0.5rem">
+            <div><span class="compare-tag">Aug</span><span class="compare-value" style="font-size:1.25rem">38,890</span></div>
+            <div><span class="compare-tag">Sep</span><span class="compare-value accent" style="font-size:1.25rem">44,834</span></div>
+          </div>
+          <p id="outboundNote" style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);line-height:1.5">September: ~63% no response / busy. <strong style="color:var(--success)">4.2%</strong> interested on all dials.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">08 / 20</span>
+      <p class="kicker">Call Owner · Calls module</p>
+      <h2>All sales team — outbound (<span data-detail-month-label>Sep 2026</span>)</h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.9rem">Call Start Time in Sep 2026 · Jayant Tuli excluded · sorted by call volume</p>
+      <div class="card table-card">
+        <table class="data-table">
+          <thead><tr><th>Call Owner</th><th class="num">Calls</th><th class="num">Talk (min)</th><th class="num">Interested</th><th class="num">Not int.</th><th class="num">Int. %</th><th class="num">No response</th></tr></thead>
+          <tbody id="callOwnersBody"><tr><td>Satvik Garg</td><td class="num">4,204</td><td class="num">802</td><td class="num">41</td><td class="num">812</td><td class="num">1.0%</td><td class="num">2,841</td></tr>
+<tr><td>Dharampal</td><td class="num">2,770</td><td class="num">324</td><td class="num">64</td><td class="num">429</td><td class="num">2.3%</td><td class="num">1,898</td></tr>
+<tr><td>Yash</td><td class="num">2,748</td><td class="num">470</td><td class="num">132</td><td class="num">609</td><td class="num">4.8%</td><td class="num">1,622</td></tr>
+<tr><td>Dilip Kumar</td><td class="num">2,668</td><td class="num">276</td><td class="num">30</td><td class="num">578</td><td class="num">1.1%</td><td class="num">1,929</td></tr>
+<tr><td>Yash Jain</td><td class="num">2,661</td><td class="num">546</td><td class="num">138</td><td class="num">594</td><td class="num">5.2%</td><td class="num">1,531</td></tr>
+<tr><td>Digendra Singh</td><td class="num">2,620</td><td class="num">349</td><td class="num">46</td><td class="num">625</td><td class="num">1.8%</td><td class="num">1,732</td></tr>
+<tr><td>Ankit Singh</td><td class="num">2,518</td><td class="num">389</td><td class="num">126</td><td class="num">398</td><td class="num">5.0%</td><td class="num">1,785</td></tr>
+<tr><td>Vivek Gautam</td><td class="num">2,396</td><td class="num">484</td><td class="num">202</td><td class="num">653</td><td class="num">8.4%</td><td class="num">1,417</td></tr>
+<tr><td>Sambhav Tiwari</td><td class="num">2,267</td><td class="num">580</td><td class="num">68</td><td class="num">484</td><td class="num">3.0%</td><td class="num">1,557</td></tr>
+<tr><td>Mukul Upadhyay</td><td class="num">2,203</td><td class="num">468</td><td class="num">129</td><td class="num">410</td><td class="num">5.9%</td><td class="num">1,498</td></tr>
+<tr><td>Hitesh Devgan</td><td class="num">2,138</td><td class="num">733</td><td class="num">163</td><td class="num">564</td><td class="num">7.6%</td><td class="num">1,080</td></tr>
+<tr><td>Shivam</td><td class="num">2,051</td><td class="num">223</td><td class="num">22</td><td class="num">367</td><td class="num">1.1%</td><td class="num">1,538</td></tr>
+<tr><td>Shivam Agarwal</td><td class="num">2,049</td><td class="num">388</td><td class="num">116</td><td class="num">518</td><td class="num">5.7%</td><td class="num">1,221</td></tr>
+<tr><td>Om Prakash</td><td class="num">1,903</td><td class="num">343</td><td class="num">64</td><td class="num">353</td><td class="num">3.4%</td><td class="num">1,328</td></tr>
+<tr><td>Honey</td><td class="num">1,882</td><td class="num">245</td><td class="num">44</td><td class="num">357</td><td class="num">2.3%</td><td class="num">1,409</td></tr>
+<tr><td>Mayank Saraswat</td><td class="num">1,695</td><td class="num">221</td><td class="num">57</td><td class="num">852</td><td class="num">3.4%</td><td class="num">748</td></tr>
+<tr><td>Harshit Jain</td><td class="num">1,691</td><td class="num">156</td><td class="num">121</td><td class="num">361</td><td class="num">7.2%</td><td class="num">1,198</td></tr>
+<tr><td>Suraj Jadwani</td><td class="num">1,374</td><td class="num">451</td><td class="num">41</td><td class="num">633</td><td class="num">3.0%</td><td class="num">571</td></tr>
+<tr><td>Ankit Sharma</td><td class="num">1,231</td><td class="num">332</td><td class="num">181</td><td class="num">271</td><td class="num">14.7%</td><td class="num">605</td></tr>
+<tr><td>Ashwani Lall</td><td class="num">1,069</td><td class="num">328</td><td class="num">47</td><td class="num">378</td><td class="num">4.4%</td><td class="num">500</td></tr>
+<tr><td>Lokendra</td><td class="num">510</td><td class="num">144</td><td class="num">53</td><td class="num">150</td><td class="num">10.4%</td><td class="num">229</td></tr>
+<tr><td>Jitendra</td><td class="num">186</td><td class="num">46</td><td class="num">2</td><td class="num">98</td><td class="num">1.1%</td><td class="num">63</td></tr>
+</tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">09 / 20</span>
+      <p class="kicker">Opportunity Owner</p>
+      <h2>All sales team — site visits &amp; pipeline · <span data-detail-month-label>Sep 2026</span></h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.9rem">Sep 2026 cohort · Ab_others empty · SV in Sep = Site Visit Date in September</p>
+      <div class="card table-card">
+        <table class="data-table">
+          <thead><tr><th>Opportunity owner</th><th class="num">Sched.</th><th class="num">Visited</th><th class="num">SV in Sep</th><th class="num">Wins</th><th class="num">Won revenue</th></tr></thead>
+          <tbody id="oppOwnersBody"><tr class="highlight"><td>Harshit Jain</td><td class="num">11</td><td class="num">10</td><td class="num">10</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Dharampal</td><td class="num">17</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">—</td></tr>
+<tr class="highlight"><td>Digendra Singh</td><td class="num">9</td><td class="num">13</td><td class="num">1</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Jayant Tuli</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">—</td></tr>
+<tr class="highlight"><td>Yash</td><td class="num">41</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">₹37.8 L</td></tr>
+<tr><td>Mukul Upadhyay</td><td class="num">35</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Ankit Singh</td><td class="num">20</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Honey</td><td class="num">12</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Shivam Agarwal</td><td class="num">11</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Mayank Saraswat</td><td class="num">11</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Dilip Kumar</td><td class="num">0</td><td class="num">27</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Hitesh Devgan</td><td class="num">0</td><td class="num">4</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Satvik Garg</td><td class="num">1</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Shivam</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Vivek Gautam</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Yash Jain</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Ashwani Lall</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+<tr><td>Lokendra</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+</tbody>
+        </table>
+      </div>
+      <p class="subtitle" style="margin-top:0.75rem;font-size:0.8rem">Sched. / Visited = current stage on Sep-created cohort. Jayant may appear on opp ownership; excluded from all Calls analytics.</p>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">10 / 20</span>
+      <p class="kicker">Revenue</p>
+      <h2>Wins &amp; booked value</h2>
+      <div class="grid-3">
+        <div class="stat-card compare" data-cmp-kpi="wins" data-cmp-fmt="num">
+          <div class="label">Total wins (cohort)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">19</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">1</span></div>
+          </div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="won_revenue" data-cmp-fmt="inr">
+          <div class="label">Booked value (won Amount)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">₹5.21 Cr</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">₹37.8 L</span></div>
+          </div>
+        </div>
+        <div class="stat-card compare" data-cmp-kpi="wins" data-cmp-fmt="pct">
+          <div class="label">Win rate (cohort)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">Aug 2026</span><span class="compare-value">0.27%</span></div>
+            <div><span class="compare-tag">Sep 2026</span><span class="compare-value accent">0.02%</span></div>
+          </div>
+          <div class="delta">Wins ÷ new opps</div>
+        </div>
+      </div>
+      <p class="subtitle" style="margin-top:1rem;font-size:0.85rem">Apr–Sep booked on cohort wins peaks in <strong style="color:var(--text)">May (₹6.04 Cr)</strong> and <strong>Aug (₹5.21 Cr)</strong>. September: single win — <strong>Yash</strong> (₹37.8 L).</p>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">11 / 20</span>
+      <p class="kicker">Revenue · people</p>
+      <h2>Wins &amp; booked revenue · month on month</h2>
+      <p class="subtitle" id="momTableNote" style="margin-top:0.35rem;font-size:0.88rem">Cohort wins &amp; Amount on opportunities owned · Ab_others empty</p>
+      <div class="card table-card" style="max-height:34vh;margin-bottom:0.75rem">
+        <h3 style="margin:0 0 0.5rem;font-size:0.95rem">Win count by owner</h3>
+        <table class="data-table" id="winsMomTable">
+          <thead>
+            <tr>
+              <th>Opportunity owner</th>
+              <th class="num" data-mom-col="2026-04">Apr</th>
+              <th class="num" data-mom-col="2026-05">May</th>
+              <th class="num" data-mom-col="2026-06">Jun</th>
+              <th class="num" data-mom-col="2026-07">Jul</th>
+              <th class="num" data-mom-col="2026-08">Aug</th>
+              <th class="num" data-mom-col="2026-09">Sep</th>
+              <th class="num">Total wins</th>
+            </tr>
+          </thead>
+          <tbody id="winsMomBody"></tbody>
+        </table>
+      </div>
+      <div class="card table-card" style="max-height:34vh">
+        <h3 style="margin:0 0 0.5rem;font-size:0.95rem">Booked revenue (₹) by owner</h3>
+        <table class="data-table" id="revenueMomTable">
+          <thead>
+            <tr>
+              <th>Opportunity owner</th>
+              <th class="num" data-mom-col="2026-04">Apr</th>
+              <th class="num" data-mom-col="2026-05">May</th>
+              <th class="num" data-mom-col="2026-06">Jun</th>
+              <th class="num" data-mom-col="2026-07">Jul</th>
+              <th class="num" data-mom-col="2026-08">Aug</th>
+              <th class="num" data-mom-col="2026-09">Sep</th>
+              <th class="num">Total booked</th>
+            </tr>
+          </thead>
+          <tbody id="revenueMomBody"></tbody>
+        </table>
+      </div>
+      <p class="subtitle" id="winsMomNote" style="margin-top:0.75rem;font-size:0.85rem">—</p>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">12 / 20</span>
+      <p class="kicker">People analytics</p>
+      <h2>Who is performing — and why · <span data-detail-month-label>Sep 2026</span></h2>
+      <p class="subtitle" id="perfSubtitle" style="margin-top:0.35rem;font-size:0.88rem" data-detail-month-subtitle data-detail-template="{month} cohort only · Any win in {month} = Star · Calls + opp ownership matched">—</p>
+      <div class="card table-card" style="max-height:58vh">
+        <table class="data-table">
+          <thead><tr><th>Rep</th><th class="num">Calls</th><th class="num">Int.%</th><th class="num">SV in month</th><th class="num">Wins</th><th class="num">Won ₹</th><th>Tier</th></tr></thead>
+          <tbody id="perfBody"></tbody>
+        </table>
+      </div>
+      <div class="callout-box" id="perfCallout">—</div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">13 / 20</span>
+      <p class="kicker">Coaching plan</p>
+      <h2>What each group should work on</h2>
+      <div class="grid-2" style="margin-top:1rem">
+        <ul class="bullets" style="margin-top:0">
+          <li><span class="tag audit">Audit first</span> <strong>Satvik, Dilip</strong> — &lt;2% interested at high volume; listen to 15–20 calls each.</li>
+          <li><span class="tag audit">Audit</span> <strong>Suraj, Om, Shivam</strong> — minimal SV in Sep on meaningful dial volume.</li>
+          <li><span class="tag coach">Coach</span> <strong>Ankit Sharma, Vivek, Lokendra</strong> — strong interest, few visits; mandatory visit CTA on “Interested”.</li>
+          <li><span class="tag warn">Ops</span> <strong>Mukul, Mayank, Honey</strong> — schedules without “Site Visited”; fix no-shows &amp; CRM stages.</li>
+        </ul>
+        <ul class="bullets" style="margin-top:0">
+          <li><span class="tag warn">Efficiency</span> <strong>Yash Jain, Satvik</strong> — top dial counts with weak funnel conversion; reduce flash volume.</li>
+          <li><span class="tag star">Replicate</span> Shadow <strong>Harshit</strong> for visit booking; study <strong>Yash</strong> Sep win motion.</li>
+          <li><span class="tag coach">Capacity</span> <strong>Jitendra</strong> — scale toward 1,500/mo without dropping quality.</li>
+          <li><strong>Note:</strong> Jayant Tuli (account owner) is excluded from all <strong>Calls</strong> metrics and hour-wise filters.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">14 / 20</span>
+      <p class="kicker">Calling pattern</p>
+      <h2>Hour-wise dials (9 AM – 7 PM IST)</h2>
+      <p class="subtitle" style="font-size:0.88rem;margin-top:0.35rem">Outbound calls · September 2026 · Business window hours 9–18 IST · <strong>Jayant Tuli excluded</strong></p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Team volume by hour</h3>
+          <div class="sm-filter-row">
+            <label for="smHourFilter">Sales manager</label>
+            <select id="smHourFilter" class="sm-select" aria-label="Filter hour chart by sales manager"></select>
+            <span class="sm-filter-meta" id="smHourMeta"></span>
+          </div>
+          <div class="hour-chart" id="hourChart" aria-live="polite"></div>
+          <div class="callout-box" style="margin-top:1rem" id="hourChartCallout"><strong>Pattern:</strong> team peak at <strong>11 AM</strong> (9,463 dials, 9–6 window) — use the filter to compare each rep vs team.</div>
+        </div>
+        <div class="card table-card">
+          <h3>Burst concentration (single hour ≥30% of rep’s 9–6 calls)</h3>
+          <table class="data-table">
+            <thead><tr><th>Rep</th><th class="num">Peak hr</th><th class="num">Calls</th><th class="num">Share</th></tr></thead>
+            <tbody><tr class="highlight"><td>Digendra Singh</td><td class="num">11 AM</td><td class="num">868</td><td class="num">33%</td></tr>
+<tr><td>Shivam Agarwal</td><td class="num">4 PM</td><td class="num">660</td><td class="num">32%</td></tr>
+<tr><td>Jitendra</td><td class="num">1 PM</td><td class="num">56</td><td class="num">30%</td></tr>
+</tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">15 / 20</span>
+      <p class="kicker">Dial quality</p>
+      <h2>Flash dials, zero talk &amp; after-hours</h2>
+      <p class="subtitle" style="font-size:0.88rem;margin-top:0.35rem"><strong>&lt;10s</strong> = likely ring/no connect · <strong>Zero talk</strong> = no conversation logged · <strong>Off-hours</strong> = before 9 AM or from 7 PM (IST)</p>
+      <div class="card table-card" style="max-height:62vh">
+        <table class="data-table">
+          <thead><tr><th>Call Owner</th><th class="num">Calls</th><th class="num">&lt;10s %</th><th class="num">Zero talk %</th><th class="num">Off-hrs</th><th>Risk flag</th></tr></thead>
+          <tbody id="flashBody"><tr><td>Satvik Garg</td><td class="num">4,204</td><td class="num">73.5%</td><td class="num">63.7%</td><td class="num">9</td><td>0.98% interested — audit</td></tr>
+<tr><td>Dharampal</td><td class="num">2,770</td><td class="num">80.8%</td><td class="num">72.1%</td><td class="num">9</td><td>Volume + flash + low interest</td></tr>
+<tr><td>Yash</td><td class="num">2,748</td><td class="num">71.0%</td><td class="num">66.8%</td><td class="num">18</td><td>Most off-hours in team</td></tr>
+<tr class="highlight"><td>Dilip Kumar</td><td class="num">2,668</td><td class="num">81.0%</td><td class="num">74.2%</td><td class="num">18</td><td>Volume + flash + low interest</td></tr>
+<tr><td>Yash Jain</td><td class="num">2,661</td><td class="num">70.5%</td><td class="num">64.5%</td><td class="num">14</td><td>Moderate</td></tr>
+<tr><td>Digendra Singh</td><td class="num">2,620</td><td class="num">71.5%</td><td class="num">64.4%</td><td class="num">6</td><td>11 AM burst + off-hours dials</td></tr>
+<tr><td>Ankit Singh</td><td class="num">2,518</td><td class="num">75.4%</td><td class="num">69.6%</td><td class="num">8</td><td>Flash-heavy</td></tr>
+<tr><td>Vivek Gautam</td><td class="num">2,396</td><td class="num">61.8%</td><td class="num">57.8%</td><td class="num">10</td><td>Moderate</td></tr>
+<tr><td>Sambhav Tiwari</td><td class="num">2,267</td><td class="num">71.4%</td><td class="num">69.4%</td><td class="num">23</td><td>Most off-hours in team</td></tr>
+<tr><td>Mukul Upadhyay</td><td class="num">2,203</td><td class="num">71.5%</td><td class="num">62.9%</td><td class="num">17</td><td>Moderate</td></tr>
+<tr><td>Hitesh Devgan</td><td class="num">2,138</td><td class="num">63.9%</td><td class="num">56.3%</td><td class="num">13</td><td>Moderate</td></tr>
+<tr><td>Shivam</td><td class="num">2,051</td><td class="num">77.3%</td><td class="num">67.8%</td><td class="num">3</td><td>Flash-heavy</td></tr>
+<tr><td>Shivam Agarwal</td><td class="num">2,049</td><td class="num">71.6%</td><td class="num">64.1%</td><td class="num">11</td><td>Moderate</td></tr>
+<tr><td>Om Prakash</td><td class="num">1,903</td><td class="num">75.2%</td><td class="num">66.6%</td><td class="num">2</td><td>Flash-heavy</td></tr>
+<tr><td>Honey</td><td class="num">1,882</td><td class="num">73.5%</td><td class="num">64.2%</td><td class="num">12</td><td>Moderate</td></tr>
+<tr><td>Mayank Saraswat</td><td class="num">1,695</td><td class="num">78.5%</td><td class="num">66.7%</td><td class="num">0</td><td>Flash-heavy</td></tr>
+<tr><td>Harshit Jain</td><td class="num">1,691</td><td class="num">78.5%</td><td class="num">69.0%</td><td class="num">2</td><td>High flash — yet SV; audit sample</td></tr>
+<tr><td>Suraj Jadwani</td><td class="num">1,374</td><td class="num">49.3%</td><td class="num">42.8%</td><td class="num">0</td><td>Moderate</td></tr>
+<tr><td>Ankit Sharma</td><td class="num">1,231</td><td class="num">63.0%</td><td class="num">54.8%</td><td class="num">16</td><td>Lower flash, best interest %</td></tr>
+<tr><td>Ashwani Lall</td><td class="num">1,069</td><td class="num">60.0%</td><td class="num">55.7%</td><td class="num">10</td><td>Moderate</td></tr>
+<tr><td>Lokendra</td><td class="num">510</td><td class="num">67.1%</td><td class="num">60.0%</td><td class="num">11</td><td>Moderate</td></tr>
+<tr><td>Jitendra</td><td class="num">186</td><td class="num">60.2%</td><td class="num">53.8%</td><td class="num">0</td><td>Clean hours; grow volume</td></tr>
+</tbody>
+        </table>
+      </div>
+      <div class="callout-box"><strong>Policy suggestion:</strong> Cap <strong>calls &lt;10s at 50%</strong> per rep per day; block off-hours dialing except approved callbacks; managers review <strong>11 AM spike</strong> lists daily. Team off-hours total: <strong>212 dials</strong> outside 9–7.</div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">16 / 20</span>
+      <p class="kicker">Insights</p>
+      <h2>Efficiency benchmark · compare months</h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.88rem">Uses <strong>Compare A / B</strong> toolbar · Jayant excluded on calls · filtered opps for dials/opp &amp; SV%</p>
+      <div class="grid-3">
+        <div class="stat-card compare" data-cmp-eff="dials_per_opp" data-cmp-eff-fmt="dec">
+          <div class="label">Outbound dials per new opp</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">A</span><span class="compare-value">—</span></div>
+            <div><span class="compare-tag">B</span><span class="compare-value accent">—</span></div>
+          </div>
+          <div class="delta" data-cmp-eff-delta>—</div>
+        </div>
+        <div class="stat-card compare" data-cmp-eff="connect_pct" data-cmp-eff-fmt="pct">
+          <div class="label">Connect rate (int. + not int.)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">A</span><span class="compare-value">—</span></div>
+            <div><span class="compare-tag">B</span><span class="compare-value accent">—</span></div>
+          </div>
+          <div class="delta" data-cmp-eff-delta>—</div>
+        </div>
+        <div class="stat-card compare" data-cmp-eff="flash_pct" data-cmp-eff-fmt="pct">
+          <div class="label">Flash dials (&lt;10s)</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">A</span><span class="compare-value">—</span></div>
+            <div><span class="compare-tag">B</span><span class="compare-value accent">—</span></div>
+          </div>
+          <div class="delta" data-cmp-eff-delta>Lower is better</div>
+        </div>
+        <div class="stat-card compare" data-cmp-eff="sv_rate" data-cmp-eff-fmt="pct">
+          <div class="label">Site visits / new opps</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">A</span><span class="compare-value">—</span></div>
+            <div><span class="compare-tag">B</span><span class="compare-value accent">—</span></div>
+          </div>
+          <div class="delta" data-cmp-eff-delta>—</div>
+        </div>
+        <div class="stat-card compare" data-cmp-eff="sarv_per_opp" data-cmp-eff-fmt="dec">
+          <div class="label">Sarv calls per new opp</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">A</span><span class="compare-value">—</span></div>
+            <div><span class="compare-tag">B</span><span class="compare-value accent">—</span></div>
+          </div>
+          <div class="delta" data-cmp-eff-delta>—</div>
+        </div>
+        <div class="stat-card compare" data-cmp-eff="data_hygiene_pct" data-cmp-eff-fmt="pct">
+          <div class="label">Ab_others exclusion share</div>
+          <div class="compare-grid">
+            <div><span class="compare-tag">A</span><span class="compare-value">—</span></div>
+            <div><span class="compare-tag">B</span><span class="compare-value accent">—</span></div>
+          </div>
+          <div class="delta" data-cmp-eff-delta>Of all opps created</div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">17 / 20</span>
+      <p class="kicker">Insights</p>
+      <h2>Outbound quality · <span data-detail-month-label>Sep 2026</span></h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.88rem">Detail month · team rollup from Calls · conversation = Interested or Not interested</p>
+      <div class="grid-4" style="margin-bottom:1rem">
+        <div class="stat-card"><div class="label">Connect rate</div><div class="value accent" id="insightConnect">—</div></div>
+        <div class="stat-card"><div class="label">Interested %</div><div class="value" id="insightInterested">—</div></div>
+        <div class="stat-card"><div class="label">Flash &lt;10s</div><div class="value" id="insightFlash">—</div></div>
+        <div class="stat-card"><div class="label">Talk min / dial</div><div class="value" id="insightTalk">—</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card table-card" style="max-height:48vh">
+          <h3>Rep leaders (wins first, then connect) · top 10</h3>
+          <table class="data-table">
+            <thead><tr><th>Call owner</th><th class="num">Wins</th><th class="num">Calls</th><th class="num">Connect %</th><th class="num">Int. %</th><th class="num">Flash %</th></tr></thead>
+            <tbody id="insightRepBody"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Dial volume by hour <span data-detail-month-label>Sep 2026</span></h3>
+          <div class="sm-filter-row" style="margin-bottom:0.5rem">
+            <label for="insightSmFilter">Sales team member</label>
+            <select id="insightSmFilter" class="sm-select" aria-label="Filter insight hour chart by rep"></select>
+            <span class="sm-filter-meta" id="insightSmMeta"></span>
+          </div>
+          <div class="hour-chart" id="insightHourChart" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">18 / 20</span>
+      <p class="kicker">Insights</p>
+      <h2>Lead source quality · <span data-detail-month-label>Sep 2026</span></h2>
+      <p class="subtitle" style="margin-top:0.35rem;font-size:0.88rem">Month-created cohort · score = visited% + 2× win% (rank sources with ≥20 leads)</p>
+      <div class="card table-card" style="max-height:62vh">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Lead source</th><th class="num">Leads</th><th class="num">Visited %</th><th class="num">Win %</th>
+              <th class="num">Quality score</th><th class="num">Sched %</th>
+            </tr>
+          </thead>
+          <tbody id="leadQualityBody"></tbody>
+        </table>
+      </div>
+      <div class="callout-box" id="leadQualityCallout">—</div>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">19 / 20</span>
+      <p class="kicker">Next steps</p>
+      <h2>Recommendations for Q4</h2>
+      <ul class="bullets">
+        <li>Stabilize <strong>filtered lead quality</strong> after August spike — September still had <strong>10,553</strong> Ab_others exclusions.</li>
+        <li>Fix <strong>post-schedule drop-off</strong> on IVR &amp; portal sources — visits stall after Site Visit Shedule.</li>
+        <li>Replicate <strong>Harshit</strong> visit motion; protect <strong>Yash</strong> win workflow from Sep cohort.</li>
+        <li>Coach <strong>Interested → site visit</strong>; benchmark <strong>Ankit Sharma</strong> call quality (~15% interested).</li>
+        <li>Align <strong>Sarv decline</strong> with IVR-led mix — single inbound narrative for client.</li>
+        <li>Keep reporting on <strong>Ab_others empty</strong> cohort for consistent client-facing numbers.</li>
+        <li>Enforce <strong>9 AM–7 PM</strong> dialing window and reduce <strong>&lt;10s flash dials</strong>.</li>
+        <li>Spread effort across hours — burst blocks at <strong>11 AM</strong> remain the dominant pattern.</li>
+      </ul>
+    </section>
+
+
+    <section class="slide">
+      <span class="slide-num">20 / 20</span>
+      <p class="kicker">Appendix</p>
+      <h2>Definitions &amp; data rules</h2>
+      <div class="grid-2">
+        <ul class="bullets" style="margin-top:0">
+          <li><strong>In scope:</strong> Opportunities with Ab_others empty (NULL or blank).</li>
+          <li><strong>Excluded (Sep):</strong> 10,553 September opps with Ab_others populated.</li>
+          <li><strong>New opps:</strong> Created Time in reporting month (Apr–Sep 2026 series).</li>
+          <li><strong>Calls / Sarv:</strong> Call Start Time in month (not Ab-filtered). <strong>Jayant Tuli excluded</strong> from all Calls metrics.</li>
+          <li><strong>Detail month</strong> and <strong>Compare A vs B</strong> are mutually exclusive (toolbar buttons). Detail = one month on all cohort/insight cards; Compare = KPI A vs B and cohort on Compare B.</li><li>Slide <strong>11</strong>: wins and <strong>booked revenue (₹)</strong> MoM by sales team member — second table is revenue.</li>
+          <li><strong>Compare A/B</strong> drives executive &amp; efficiency benchmark (slide 16).</li>
+          <li><strong>Stars (slide 12):</strong> any rep with ≥1 cohort win in the detail month is tagged <strong>Star (win)</strong>.</li>
+          <li><strong>Performance join:</strong> Call Owner Name matched to Opportunity Owner Name for SV / wins.</li>
+        </ul>
+        <div class="stat-card">
+          <div class="label">Prepared from</div>
+          <p style="margin-top:0.5rem;line-height:1.6;color:var(--text-muted);font-size:0.9rem">
+            Zoho CRM Analytics · Alokit Housing org<br />
+            Modules: Opportunity, Sarv Calls, Calls<br />
+            April–September 2026 · IST
+          </p>
+        </div>
+      </div>
+      <p class="subtitle" style="margin-top:2.5rem;font-size:1rem;color:var(--accent)">Thank you</p>
+    </section>
+
+  </div>
+
+  <script>
+
+    const deck = document.getElementById("deck");
+    const progress = document.getElementById("progress");
+    const slides = document.querySelectorAll(".slide");
+
+    function updateProgress() {
+      const scrollMax = deck.scrollHeight - deck.clientHeight;
+      const pct = scrollMax > 0 ? (deck.scrollTop / scrollMax) * 100 : 0;
+      progress.style.width = pct + "%";
+    }
+
+    deck.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+
+    document.addEventListener("keydown", (e) => {
+      const h = window.innerHeight;
+      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
+        e.preventDefault();
+        deck.scrollBy({ top: h, behavior: "smooth" });
+      }
+      if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        deck.scrollBy({ top: -h, behavior: "smooth" });
+      }
+    });
+
+    /* Hour-wise chart: Sep 2026, hours 9–18 IST. Jayant Tuli excluded (no Calls activity). */
+    const HOUR_LABELS = ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM"];
+    const EXCLUDED_SM = ["Jayant Tuli"];
+    let HOURLY_BY_SM = {
+  "Ankit Sharma": [
+    7,
+    181,
+    322,
+    358,
+    91,
+    78,
+    98,
+    46,
+    18,
+    16
+  ],
+  "Ankit Singh": [
+    16,
+    202,
+    726,
+    251,
+    184,
+    318,
+    259,
+    370,
+    172,
+    12
+  ],
+  "Ashwani Lall": [
+    0,
+    40,
+    220,
+    232,
+    179,
+    138,
+    72,
+    96,
+    69,
+    13
+  ],
+  "Dharampal": [
+    1,
+    423,
+    700,
+    248,
+    248,
+    190,
+    378,
+    366,
+    175,
+    32
+  ],
+  "Digendra Singh": [
+    4,
+    50,
+    868,
+    306,
+    36,
+    31,
+    151,
+    378,
+    545,
+    245
+  ],
+  "Dilip Kumar": [
+    0,
+    34,
+    622,
+    669,
+    37,
+    183,
+    286,
+    271,
+    379,
+    169
+  ],
+  "Harshit Jain": [
+    0,
+    16,
+    449,
+    333,
+    4,
+    35,
+    64,
+    200,
+    348,
+    240
+  ],
+  "Hitesh Devgan": [
+    0,
+    188,
+    332,
+    322,
+    262,
+    281,
+    312,
+    244,
+    165,
+    19
+  ],
+  "Honey": [
+    3,
+    52,
+    383,
+    208,
+    133,
+    194,
+    218,
+    254,
+    271,
+    154
+  ],
+  "Jitendra": [
+    0,
+    1,
+    19,
+    29,
+    56,
+    20,
+    20,
+    5,
+    36,
+    0
+  ],
+  "Lokendra": [
+    4,
+    9,
+    122,
+    93,
+    67,
+    57,
+    18,
+    41,
+    87,
+    1
+  ],
+  "Mayank Saraswat": [
+    0,
+    25,
+    248,
+    285,
+    75,
+    86,
+    217,
+    313,
+    367,
+    79
+  ],
+  "Mukul Upadhyay": [
+    3,
+    176,
+    499,
+    306,
+    290,
+    277,
+    265,
+    202,
+    141,
+    27
+  ],
+  "Om Prakash": [
+    0,
+    222,
+    544,
+    232,
+    235,
+    204,
+    181,
+    162,
+    111,
+    10
+  ],
+  "Sambhav Tiwari": [
+    2,
+    25,
+    338,
+    421,
+    67,
+    136,
+    220,
+    425,
+    456,
+    154
+  ],
+  "Satvik Garg": [
+    8,
+    147,
+    480,
+    827,
+    542,
+    554,
+    628,
+    526,
+    394,
+    89
+  ],
+  "Shivam": [
+    3,
+    29,
+    217,
+    226,
+    317,
+    121,
+    293,
+    510,
+    320,
+    12
+  ],
+  "Shivam Agarwal": [
+    1,
+    56,
+    320,
+    291,
+    108,
+    148,
+    278,
+    660,
+    164,
+    12
+  ],
+  "Suraj Jadwani": [
+    0,
+    98,
+    295,
+    272,
+    231,
+    233,
+    151,
+    54,
+    38,
+    2
+  ],
+  "Vivek Gautam": [
+    2,
+    123,
+    478,
+    355,
+    111,
+    273,
+    246,
+    327,
+    389,
+    82
+  ],
+  "Yash": [
+    4,
+    79,
+    771,
+    469,
+    271,
+    402,
+    330,
+    274,
+    81,
+    49
+  ],
+  "Yash Jain": [
+    1,
+    98,
+    510,
+    563,
+    472,
+    450,
+    272,
+    165,
+    99,
+    17
+  ]
+};
+
+    function sumHourlyArrays(arrays) {
+      const n = HOUR_LABELS.length;
+      const out = new Array(n).fill(0);
+      arrays.forEach((row) => {
+        for (let i = 0; i < n; i++) out[i] += row[i] || 0;
+      });
+      return out;
+    }
+
+    function teamHourlyTotals() {
+      if (window._teamHourly && (!HOURLY_BY_SM || !Object.keys(HOURLY_BY_SM).length)) return window._teamHourly;
+      return sumHourlyArrays(
+        Object.entries(HOURLY_BY_SM)
+          .filter(([name]) => !EXCLUDED_SM.includes(name))
+          .map(([, counts]) => counts)
+      );
+    }
+
+    function formatNum(n) {
+      return n.toLocaleString("en-IN");
+    }
+
+    function renderHourChart(counts, peakIndex) {
+      const container = document.getElementById("hourChart");
+      if (!container) return;
+      const max = Math.max(...counts, 1);
+      const peak = peakIndex ?? counts.indexOf(Math.max(...counts));
+      container.innerHTML = counts
+        .map((c, i) => {
+          const w = Math.max(0.5, (c / max) * 100);
+          const peakClass = i === peak ? "peak" : "";
+          return `<span class="hr-label">${HOUR_LABELS[i]}</span><div class="hr-bar"><span class="${peakClass}" style="width:${w.toFixed(1)}%"></span></div><span class="hr-val">${formatNum(c)}</span>`;
+        })
+        .join("");
+    }
+
+    
+    function loadHourlyForDetailMonth() {
+      const mbr = JSON.parse(document.getElementById('mbr-data').textContent);
+      const m = window._detailMonth || '2026-09';
+      if (mbr.hourlyByMonth && mbr.hourlyByMonth[m]) {
+        HOURLY_BY_SM = mbr.hourlyByMonth[m];
+        return;
+      }
+      HOURLY_BY_SM = {};
+    }
+
+    function initHourFilter() {
+      loadHourlyForDetailMonth();
+      const select = document.getElementById("smHourFilter");
+      const meta = document.getElementById("smHourMeta");
+      if (!select) return;
+
+      const team = teamHourlyTotals();
+      const names = Object.keys(HOURLY_BY_SM)
+        .filter((n) => !EXCLUDED_SM.includes(n))
+        .sort((a, b) => a.localeCompare(b));
+
+      select.innerHTML =
+        `<option value="__team__">All sales managers (team total)</option>` +
+        names.map((n) => `<option value="${n.replace(/"/g, "&quot;")}">${n}</option>`).join("");
+
+      function update() {
+        const val = select.value;
+        let counts;
+        let label;
+        if (val === "__team__") {
+          counts = team;
+          label = `Team total: ${formatNum(counts.reduce((a, b) => a + b, 0))} calls (9 AM–6 PM) · excludes Jayant Tuli`;
+        } else {
+          counts = HOURLY_BY_SM[val] || new Array(HOUR_LABELS.length).fill(0);
+          const total = counts.reduce((a, b) => a + b, 0);
+          const peakHr = HOUR_LABELS[counts.indexOf(Math.max(...counts))];
+          const peakShare = total ? ((Math.max(...counts) / total) * 100).toFixed(0) : 0;
+          label = `${val}: ${formatNum(total)} calls · peak ${peakHr} (${peakShare}% of their 9–6 dials)`;
+        }
+        if (meta) meta.textContent = label;
+        renderHourChart(counts);
+      }
+
+      select.addEventListener("change", update);
+      update();
+    }
+
+    
+    const MBR = JSON.parse(document.getElementById('mbr-data').textContent);
+    const MONTHS = MBR.months;
+    const LABEL = MBR.labels;
+
+    function fmtNum(n) { return Number(n).toLocaleString('en-IN'); }
+    function fmtInr(amount) {
+      if (!amount || amount <= 0) return '—';
+      if (amount >= 1e7) return '₹' + (amount / 1e7).toFixed(2) + ' Cr';
+      if (amount >= 1e5) return '₹' + (amount / 1e5).toFixed(1) + ' L';
+      if (amount >= 1e3) return '₹' + (amount / 1e3).toFixed(1) + ' K';
+      return '₹' + Math.round(amount);
+    }
+    function pct(a, b, d = 1) { return b ? (100 * a / b).toFixed(d) + '%' : '0%'; }
+    function mom(cur, prev) {
+      if (!prev) return { text: '—', cls: '' };
+      const ch = ((cur - prev) / prev) * 100;
+      const sign = ch >= 0 ? '+' : '';
+      return { text: sign + ch.toFixed(0) + '% MoM', cls: ch >= 0 ? 'up' : 'down' };
+    }
+
+    function tierForRep(r) {
+      if (r.wins > 0) return { cls: 'star', label: 'Star (win)', hi: true };
+      const { intPct, sv1k, calls, name, svInMonth } = r;
+      if (intPct < 2 && sv1k < 1 && calls > 500) return { cls: 'audit', label: 'Audit', hi: false };
+      if (intPct >= 12 && sv1k < 5) return { cls: 'coach', label: 'Book visits', hi: false };
+      if (name === 'Mukul Upadhyay' && svInMonth === 0 && r.sched > 5) return { cls: 'warn', label: 'Sched not visited', hi: false };
+      if (calls > 2500 && sv1k < 3) return { cls: 'warn', label: 'High effort / low yield', hi: false };
+      if (intPct >= 8 && sv1k < 8) return { cls: 'coach', label: 'Scale visit→win', hi: false };
+      return { cls: 'coach', label: 'Coach', hi: false };
+    }
+
+    function buildPerfRows(m) {
+      const oppBy = {}, callBy = {};
+      (MBR.oppOwners[m] || []).forEach(o => { oppBy[o.owner] = o; });
+      (MBR.callOwners[m] || []).forEach(c => { callBy[c.owner] = c; });
+      const names = new Set([...Object.keys(oppBy), ...Object.keys(callBy)]);
+      const rows = [];
+      names.forEach(name => {
+        if (name === 'Jayant Tuli') return;
+        const c = callBy[name] || { calls: 0, interested: 0 };
+        const o = oppBy[name] || { sv_in_month: 0, wins: 0, won_revenue: 0, sched: 0, visited: 0 };
+        const calls = c.calls || 0;
+        if (calls < 150 && !o.wins && !o.sv_in_month && !o.visited && !o.sched) return;
+        const intPct = calls ? 100 * c.interested / calls : 0;
+        const sv1k = calls ? 1000 * (o.sv_in_month || 0) / calls : 0;
+        rows.push({
+          name, calls, intPct, svInMonth: o.sv_in_month || 0, sv1k,
+          wins: o.wins || 0, revenue: o.won_revenue || 0, sched: o.sched || 0,
+        });
+      });
+      rows.sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        if (b.revenue !== a.revenue) return b.revenue - a.revenue;
+        return b.svInMonth - a.svInMonth;
+      });
+      return rows.slice(0, 22);
+    }
+
+    function renderPerfTable(m) {
+      const rows = buildPerfRows(m);
+      const pb = document.getElementById('perfBody');
+      if (!pb) return;
+      const stars = rows.filter(r => r.wins > 0);
+      pb.innerHTML = rows.map(r => {
+        const t = tierForRep(r);
+        const hl = t.hi ? ' class="highlight"' : '';
+        return `<tr${hl}><td>${r.name}</td><td class="num">${fmtNum(r.calls)}</td><td class="num">${r.intPct.toFixed(1)}%</td><td class="num">${r.svInMonth}</td><td class="num">${r.wins}</td><td class="num">${fmtInr(r.revenue)}</td><td><span class="tag ${t.cls}">${t.label}</span></td></tr>`;
+      }).join('');
+      const co = document.getElementById('perfCallout');
+      if (co) {
+        if (stars.length) {
+          const list = stars.map(s => `<strong>${s.name}</strong> (${s.wins} win${s.wins > 1 ? 's' : ''}, ${fmtInr(s.revenue)})`).join('; ');
+          co.innerHTML = `<strong>${LABEL[m]} — priority stars (wins):</strong> ${list}. Everyone else is tiered on visits &amp; call quality only for this month.`;
+        } else {
+          co.innerHTML = `<strong>${LABEL[m]}:</strong> No cohort wins yet — focus tiers on site visits (SV in month) and connect quality, not prior-month reputation.`;
+        }
+      }
+    }
+
+    window.filterMode = 'detail';
+
+    function getCompareMonths() {
+      return {
+        a: document.getElementById('compareMonthA').value,
+        b: document.getElementById('compareMonthB').value,
+      };
+    }
+
+    function setFilterMode(mode) {
+      window.filterMode = mode;
+      const detail = document.getElementById('detailMonth');
+      const cmpA = document.getElementById('compareMonthA');
+      const cmpB = document.getElementById('compareMonthB');
+      const deck = document.getElementById('deck');
+      if (detail) detail.disabled = mode === 'compare';
+      if (cmpA) cmpA.disabled = mode === 'detail';
+      if (cmpB) cmpB.disabled = mode === 'detail';
+      document.querySelectorAll('.month-toolbar label').forEach(lab => {
+        const id = lab.getAttribute('for');
+        if (id === 'detailMonth') lab.classList.toggle('filter-off', mode === 'compare');
+        if (id === 'compareMonthA' || id === 'compareMonthB') lab.classList.toggle('filter-off', mode === 'detail');
+      });
+      if (deck) {
+        deck.classList.toggle('filter-mode-detail', mode === 'detail');
+        deck.classList.toggle('filter-mode-compare', mode === 'compare');
+      }
+      const hint = document.getElementById('filterModeHint');
+      if (hint) {
+        hint.textContent = mode === 'detail'
+          ? 'Detail mode: all cards show the selected month only.'
+          : 'Compare mode: KPI cards show A vs B; tables use Compare B month.';
+      }
+      const btnD = document.getElementById('useDetailMode');
+      const btnC = document.getElementById('useCompareMode');
+      if (btnD) { btnD.classList.toggle('active', mode === 'detail'); btnD.setAttribute('aria-pressed', mode === 'detail' ? 'true' : 'false'); }
+      if (btnC) { btnC.classList.toggle('active', mode === 'compare'); btnC.setAttribute('aria-pressed', mode === 'compare' ? 'true' : 'false'); }
+      if (mode === 'detail') applyDetailMode();
+      else applyCompareMode();
+    }
+
+    function highlightMomColumns(months) {
+      const set = new Set(months);
+      document.querySelectorAll('[data-mom-col]').forEach(th => {
+        th.classList.toggle('wins-col-detail', set.has(th.dataset.momCol));
+      });
+    }
+
+    function leadVisitCell(visited, leads) {
+      if (!leads && !visited) return '—';
+      const pct = leads > 0 ? (100 * visited / leads) : null;
+      const pctStr = pct === null ? '—' : (pct >= 10 ? pct.toFixed(1) : pct.toFixed(2)) + '%';
+      const main = visited > 0 ? fmtNum(visited) : '0';
+      const meta = `(${fmtNum(leads)} · ${pctStr} visited)`;
+      return `<span class="cell-main">${main}</span><span class="cell-meta">${meta}</span>`;
+    }
+
+    function renderLeadVisitedMom(highlightMonths) {
+      const block = MBR.leadSourceVisitedMom;
+      const body = document.getElementById('leadVisitedMomBody');
+      if (!block || !body) return;
+      highlightMomColumns(highlightMonths);
+      const { sources, visited, leads, monthTotals } = block;
+      body.innerHTML = (sources || []).map(src => {
+        const vm = visited[src] || {};
+        const lm = (leads && leads[src]) ? leads[src] : {};
+        let totalV = 0;
+        let totalL = 0;
+        const cells = MONTHS.map(mo => {
+          const v = vm[mo] || 0;
+          const l = lm[mo] || 0;
+          totalV += v;
+          totalL += l;
+          let tdCls = 'num cell-mom';
+          if (highlightMonths.includes(mo)) tdCls += ' wins-col-detail';
+          if (v > 0) tdCls += ' highlight';
+          return `<td class="${tdCls}">${leadVisitCell(v, l)}</td>`;
+        }).join('');
+        const rowHi = totalV >= 10 ? ' class="highlight"' : '';
+        const totCell = leadVisitCell(totalV, totalL);
+        return `<tr${rowHi}><td>${src}</td>${cells}<td class="num cell-mom"><strong>${totCell}</strong></td></tr>`;
+      }).join('');
+      let grandV = 0;
+      let grandL = 0;
+      MONTHS.forEach(mo => {
+        const el = document.getElementById('leadVisitedFoot-' + mo);
+        const mt = monthTotals[mo] || { visited: 0, leads: 0 };
+        const v = typeof mt === 'number' ? mt : (mt.visited || 0);
+        const l = typeof mt === 'number' ? 0 : (mt.leads || 0);
+        grandV += v;
+        grandL += l;
+        if (el) el.innerHTML = leadVisitCell(v, l);
+      });
+      const ft = document.getElementById('leadVisitedFoot-total');
+      if (ft) ft.innerHTML = `<strong>${leadVisitCell(grandV, grandL)}</strong>`;
+    }
+
+    function renderLeadSourceBars(m) {
+      const bars = document.getElementById('leadSourceBars');
+      if (!bars) return;
+      const leads = (MBR.leadSource[m] || []).sort((a, b) => b.leads - a.leads).slice(0, 5);
+      if (!leads.length) {
+        bars.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">No lead source data.</p>';
+        return;
+      }
+      const max = leads[0].leads || 1;
+      bars.innerHTML = leads.map(r => {
+        const w = Math.max(4, Math.round((r.leads / max) * 100));
+        const hl = r.source === 'IVR call' ? ' highlight' : '';
+        return `<div class="bar-row${hl}"><span>${r.source}</span><div class="track"><div class="fill" style="width:${w}%"></div></div><span class="num">${fmtNum(r.leads)}</span></div>`;
+      }).join('');
+    }
+
+    function renderMomTables(highlightMonths, noteMonth) {
+      if (!MBR.winsMom) return;
+      highlightMomColumns(highlightMonths);
+      const winBody = document.getElementById('winsMomBody');
+      const revBody = document.getElementById('revenueMomBody');
+      const note = document.getElementById('winsMomNote');
+      const stars = [];
+      if (winBody) {
+        winBody.innerHTML = (MBR.winsMom.owners || []).map(owner => {
+          const wm = MBR.winsMom.wins[owner] || {};
+          const rm = MBR.winsMom.revenue[owner] || {};
+          let totalW = 0;
+          const wCells = MONTHS.map(mo => {
+            const w = wm[mo] || 0;
+            totalW += w;
+            let tdCls = 'num';
+            if (highlightMonths.includes(mo)) tdCls += ' wins-col-detail';
+            if (w > 0) tdCls += ' highlight';
+            if (mo === noteMonth && w > 0) stars.push(owner);
+            return `<td class="${tdCls}">${w > 0 ? w : '—'}</td>`;
+          }).join('');
+          const rowHi = highlightMonths.some(mo => (wm[mo] || 0) > 0 && mo === noteMonth) ? ' class="highlight"' : '';
+          return `<tr${rowHi}><td>${owner}</td>${wCells}<td class="num"><strong>${totalW}</strong></td></tr>`;
+        }).join('');
+      }
+      if (revBody) {
+        revBody.innerHTML = (MBR.winsMom.owners || []).map(owner => {
+          const rm = MBR.winsMom.revenue[owner] || {};
+          let totalR = 0;
+          const rCells = MONTHS.map(mo => {
+            const v = rm[mo] || 0;
+            totalR += v;
+            let tdCls = 'num';
+            if (highlightMonths.includes(mo)) tdCls += ' wins-col-detail';
+            if (v > 0) tdCls += ' highlight';
+            return `<td class="${tdCls}">${v > 0 ? fmtInr(v) : '—'}</td>`;
+          }).join('');
+          const rowHi = totalR > 0 && (rm[noteMonth] || 0) > 0 ? ' class="highlight"' : '';
+          return `<tr${rowHi}><td>${owner}</td>${rCells}<td class="num"><strong>${fmtInr(totalR)}</strong></td></tr>`;
+        }).join('');
+      }
+      if (note) {
+        note.innerHTML = stars.length
+          ? `<strong>${LABEL[noteMonth]} — stars (wins):</strong> ${stars.join(', ')}.`
+          : `No cohort wins in <strong>${LABEL[noteMonth]}</strong> in this matrix.`;
+      }
+    }
+
+    function renderSingleMonthKpiCards(m) {
+      const k = MBR.kpi;
+      document.querySelectorAll('[data-cmp-kpi]').forEach(card => {
+        const key = card.dataset.cmpKpi;
+        const fmt = card.dataset.cmpFmt || 'num';
+        const v = k[key][m];
+        const disp = fmt === 'inr' ? fmtInr(v) : (fmt === 'pct' ? pct(k.wins[m], k.new_opps[m], 2) : fmtNum(v));
+        const tags = card.querySelectorAll('.compare-tag');
+        const vals = card.querySelectorAll('.compare-value');
+        if (tags[0]) tags[0].textContent = LABEL[m];
+        if (tags[1]) tags[1].textContent = '—';
+        if (vals[0]) vals[0].textContent = disp;
+        if (vals[1]) vals[1].textContent = '';
+        const delta = card.querySelector('[data-cmp-delta]');
+        if (delta) { delta.textContent = 'Detail month view'; delta.className = 'delta'; }
+      });
+      document.querySelectorAll('[data-cmp-eff]').forEach(card => {
+        if (!MBR.efficiency || !MBR.efficiency[m]) return;
+        const key = card.dataset.cmpEff;
+        const fmt = card.dataset.cmpEffFmt || 'num';
+        const v = MBR.efficiency[m][key];
+        const disp = fmt === 'pct' ? v.toFixed(1) + '%' : (fmt === 'dec' ? Number(v).toFixed(1) : fmtNum(v));
+        const tags = card.querySelectorAll('.compare-tag');
+        const vals = card.querySelectorAll('.compare-value');
+        if (tags[0]) tags[0].textContent = LABEL[m];
+        if (tags[1]) tags[1].textContent = '—';
+        if (vals[0]) vals[0].textContent = disp;
+        if (vals[1]) vals[1].textContent = '';
+      });
+      const ex = document.getElementById('exec-excluded-note');
+      if (ex) ex.innerHTML = `<strong>${fmtNum(k.excluded_opps[m])}</strong> opportunities excluded in <strong>${LABEL[m]}</strong> (Ab_others populated).`;
+    }
+
+    function renderCohortForMonth(m) {
+      document.querySelectorAll('[data-detail-month-label]').forEach(el => { el.textContent = LABEL[m]; });
+      document.querySelectorAll('[data-detail-month-subtitle]').forEach(el => {
+        if (el.dataset.detailTemplate) el.textContent = el.dataset.detailTemplate.replace(/{month}/g, LABEL[m]);
+      });
+      renderPerfTable(m);
+      const funnel = (MBR.funnel[m] || []).sort((x, y) => y.cnt - x.cnt);
+      const ft = funnel.reduce((s, r) => s + r.cnt, 0) || 1;
+      const fb = document.getElementById('funnelBody');
+      if (fb) fb.innerHTML = funnel.map(r => {
+        const hl = ['Site Visited', 'Opportunity Won'].includes(r.stage) ? ' class="highlight"' : '';
+        return `<tr${hl}><td>${r.stage}</td><td class="num">${fmtNum(r.cnt)}</td><td class="num">${pct(r.cnt, ft)}</td></tr>`;
+      }).join('');
+      const leads = (MBR.leadSource[m] || []).sort((a, b) => b.leads - a.leads).slice(0, 8);
+      const lb = document.getElementById('leadSourceBody');
+      if (lb) lb.innerHTML = leads.map(r => {
+        const hl = r.source === 'IVR call' ? ' class="highlight"' : '';
+        return `<tr${hl}><td>${r.source}</td><td class="num">${fmtNum(r.leads)}</td><td class="num">${r.sched}</td><td class="num">${r.visited}</td><td class="num">${r.won}</td><td class="num">${pct(r.sched, r.leads)}</td><td class="num">${pct(r.visited, r.leads)}</td><td class="num">${pct(r.won, r.leads, 2)}</td></tr>`;
+      }).join('');
+      const co = (MBR.callOwners[m] || []).sort((a, b) => b.calls - a.calls);
+      const cob = document.getElementById('callOwnersBody');
+      if (cob) cob.innerHTML = co.map(r =>
+        `<tr><td>${r.owner}</td><td class="num">${fmtNum(r.calls)}</td><td class="num">${r.talk_min}</td><td class="num">${r.interested}</td><td class="num">${r.not_int}</td><td class="num">${pct(r.interested, r.calls)}</td><td class="num">${fmtNum(r.no_resp)}</td></tr>`
+      ).join('');
+      const oo = (MBR.oppOwners[m] || []).filter(r => r.sched || r.visited || r.sv_in_month || r.wins)
+        .sort((a, b) => b.sv_in_month - a.sv_in_month);
+      const oob = document.getElementById('oppOwnersBody');
+      if (oob) oob.innerHTML = oo.map(r =>
+        `<tr><td>${r.owner}</td><td class="num">${r.sched}</td><td class="num">${r.visited}</td><td class="num">${r.sv_in_month}</td><td class="num">${r.wins}</td><td class="num">${fmtInr(r.won_revenue)}</td></tr>`
+      ).join('');
+      const fl = (MBR.flash[m] || []).sort((a, b) => b.calls - a.calls);
+      const flb = document.getElementById('flashBody');
+      if (flb) flb.innerHTML = fl.map(r => {
+        const fp = pct(r.flash, r.calls), zp = pct(r.zero_talk, r.calls);
+        return `<tr><td>${r.owner}</td><td class="num">${fmtNum(r.calls)}</td><td class="num">${fp}</td><td class="num">${zp}</td><td class="num">${r.off_hours}</td><td>—</td></tr>`;
+      }).join('');
+      const results = (MBR.callResults[m] || []).sort((a, b) => b.cnt - a.cnt);
+      const rb = document.getElementById('callResultsBars');
+      if (rb && results.length) {
+        const max = results[0].cnt;
+        rb.innerHTML = results.slice(0, 4).map(r =>
+          `<div class="bar-row"><span>${r.result}</span><div class="track"><div class="fill" style="width:${Math.round((r.cnt / max) * 100)}%"></div></div><span class="num">${fmtNum(r.cnt)}</span></div>`
+        ).join('');
+        const total = results.reduce((s, r) => s + r.cnt, 0);
+        const interested = results.find(r => r.result === 'Interested');
+        const noResp = results.find(r => r.result === 'No response/Busy');
+        const note = document.getElementById('outboundNote');
+        if (note) note.innerHTML = `${LABEL[m]}: ~${pct(noResp?.cnt || 0, total, 0)} no response / busy. <strong style="color:var(--success)">${pct(interested?.cnt || 0, total)}</strong> interested.`;
+      }
+      renderInsightPanels(m);
+      renderLeadSourceBars(m);
+      window._detailMonth = m;
+      window._teamHourly = MBR.teamHourly[m] || new Array(10).fill(0);
+      if (typeof loadHourlyForDetailMonth === 'function') loadHourlyForDetailMonth();
+      if (typeof initHourFilter === 'function') initHourFilter();
+      if (typeof initInsightHourFilter === 'function') initInsightHourFilter();
+    }
+
+    function renderInsightPanels(m) {
+      if (!MBR.efficiency || !MBR.efficiency[m]) return;
+      const ef = MBR.efficiency[m];
+      const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+      set('insightConnect', ef.connect_pct.toFixed(1) + '%');
+      set('insightInterested', ef.interested_pct.toFixed(1) + '%');
+      set('insightFlash', ef.flash_pct.toFixed(1) + '%');
+      set('insightTalk', ef.talk_min_per_call.toFixed(2));
+      const flashByOwner = {};
+      (MBR.flash[m] || []).forEach(r => { flashByOwner[r.owner] = r; });
+      const winOwners = new Set((MBR.oppOwners[m] || []).filter(o => o.wins > 0).map(o => o.owner));
+      const reps = (MBR.callOwners[m] || [])
+        .filter(r => r.calls >= 200 || winOwners.has(r.owner))
+        .map(r => {
+          const fl = flashByOwner[r.owner];
+          const flashPct = fl ? (100 * fl.flash / fl.calls) : 0;
+          const connect = 100 * (r.interested + r.not_int) / r.calls;
+          const intPct = 100 * r.interested / r.calls;
+          const wins = (MBR.oppOwners[m] || []).find(o => o.owner === r.owner)?.wins || 0;
+          return { ...r, connect, intPct, flashPct, wins };
+        })
+        .sort((a, b) => (b.wins !== a.wins ? b.wins - a.wins : b.connect - a.connect))
+        .slice(0, 10);
+      const irb = document.getElementById('insightRepBody');
+      if (irb) irb.innerHTML = reps.map(r => {
+        const hl = r.wins > 0 ? ' class="highlight"' : '';
+        const winCol = r.wins > 0 ? `<td class="num">${r.wins}</td>` : '<td class="num">—</td>';
+        return `<tr${hl}><td>${r.owner}</td>${winCol}<td class="num">${fmtNum(r.calls)}</td><td class="num">${r.connect.toFixed(1)}%</td><td class="num">${r.intPct.toFixed(1)}%</td><td class="num">${r.flashPct.toFixed(1)}%</td></tr>`;
+      }).join('');
+      const lq = (MBR.leadSource[m] || [])
+        .filter(r => r.leads >= 20)
+        .map(r => {
+          const visitedPct = r.leads ? (100 * r.visited / r.leads) : 0;
+          const winPct = r.leads ? (100 * r.won / r.leads) : 0;
+          const schedPct = r.leads ? (100 * r.sched / r.leads) : 0;
+          return { ...r, visitedPct, winPct, schedPct, score: visitedPct + 2 * winPct };
+        })
+        .sort((a, b) => b.score - a.score);
+      const lqb = document.getElementById('leadQualityBody');
+      if (lqb) lqb.innerHTML = lq.map(r => {
+        const hl = r.score >= 5 ? ' class="highlight"' : '';
+        return `<tr${hl}><td>${r.source}</td><td class="num">${fmtNum(r.leads)}</td><td class="num">${r.visitedPct.toFixed(1)}%</td><td class="num">${r.winPct.toFixed(2)}%</td><td class="num">${r.score.toFixed(1)}</td><td class="num">${r.schedPct.toFixed(1)}%</td></tr>`;
+      }).join('');
+      const lqc = document.getElementById('leadQualityCallout');
+      if (lqc && lq.length) {
+        const best = lq[0], ivr = lq.find(r => r.source === 'IVR call');
+        lqc.innerHTML = `<strong>Best quality (≥20 leads):</strong> ${best.source} (score ${best.score.toFixed(1)}). ` +
+          (ivr ? `<strong>IVR</strong> — visited ${ivr.visitedPct.toFixed(1)}%, win ${ivr.winPct.toFixed(2)}% on ${fmtNum(ivr.leads)} leads.` : '');
+      }
+    }
+
+    function initInsightHourFilter() {
+      const select = document.getElementById('insightSmFilter');
+      const meta = document.getElementById('insightSmMeta');
+      const container = document.getElementById('insightHourChart');
+      if (!select || !container) return;
+      const m = window._detailMonth || document.getElementById('detailMonth').value;
+      const team = MBR.teamHourly[m] || new Array(10).fill(0);
+      const hLabels = MBR.hourLabels || ['9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM'];
+      const hourly = (MBR.hourlyByMonth && MBR.hourlyByMonth[m]) ? MBR.hourlyByMonth[m] : {};
+      const names = Object.keys(hourly).filter(n => n !== 'Jayant Tuli').sort((a, b) => a.localeCompare(b));
+      const callNames = (MBR.callOwners[m] || []).map(r => r.owner).filter(n => n !== 'Jayant Tuli');
+      callNames.forEach(n => { if (!names.includes(n)) names.push(n); });
+      names.sort((a, b) => a.localeCompare(b));
+      select.innerHTML = `<option value="__team__">All sales managers (team total)</option>` +
+        names.map(n => `<option value="${n.replace(/"/g, '&quot;')}">${n}</option>`).join('');
+      function renderBars(counts) {
+        const max = Math.max(...counts, 1);
+        const peak = counts.indexOf(Math.max(...counts));
+        container.innerHTML = counts.map((c, i) => {
+          const w = Math.max(0.5, (c / max) * 100);
+          const peakClass = i === peak ? 'peak' : '';
+          return `<span class="hr-label">${hLabels[i]}</span><div class="hr-bar"><span class="${peakClass}" style="width:${w.toFixed(1)}%"></span></div><span class="hr-val">${fmtNum(c)}</span>`;
+        }).join('');
+      }
+      function update() {
+        const val = select.value;
+        if (val === '__team__') {
+          renderBars(team);
+          if (meta) meta.textContent = `Team: ${fmtNum(team.reduce((a,b)=>a+b,0))} calls (9 AM–6 PM)`;
+          return;
+        }
+        const counts = hourly[val];
+        if (counts && counts.length) {
+          renderBars(counts);
+          const total = counts.reduce((a, b) => a + b, 0);
+          if (meta) meta.textContent = `${val}: ${fmtNum(total)} calls · rep-level hour data`;
+        } else {
+          renderBars(team);
+          if (meta) meta.textContent = `Per-rep hour breakdown not exported for ${LABEL[m]} — showing team total. (Rep-level: Aug & Sep.)`;
+        }
+      }
+      select.onchange = update;
+      update();
+    }
+
+    function applyDetailMode() {
+      const m = document.getElementById('detailMonth').value;
+      renderSingleMonthKpiCards(m);
+      renderMomTables([m], m);
+      renderLeadVisitedMom([m]);
+      renderCohortForMonth(m);
+    }
+
+    function applyCompareMode() {
+      const { a, b } = getCompareMonths();
+      updateCompareCards();
+      renderMomTables([a, b], b);
+      renderLeadVisitedMom([a, b]);
+      renderCohortForMonth(b);
+      const note = document.getElementById('momTableNote');
+      if (note) note.textContent = `Compare mode · cohort tables show ${LABEL[b]} · MoM columns highlight A & B`;
+    }
+
+    function fillMonthSelects() {
+      const opts = MONTHS.map(mo => `<option value="${mo}">${LABEL[mo]}</option>`).join('');
+      ['compareMonthA', 'compareMonthB', 'detailMonth'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = opts;
+      });
+      document.getElementById('compareMonthA').value = '2026-08';
+      document.getElementById('compareMonthB').value = '2026-09';
+      document.getElementById('detailMonth').value = '2026-09';
+    }
+
+    function updateCompareCards() {
+      if (window.filterMode !== 'compare') return;
+      const { a, b } = getCompareMonths();
+      const k = MBR.kpi;
+      document.querySelectorAll('[data-cmp-kpi]').forEach(card => {
+        const key = card.dataset.cmpKpi;
+        const fmt = card.dataset.cmpFmt || 'num';
+        const va = k[key][a], vb = k[key][b];
+        const disp = (v) => fmt === 'inr' ? fmtInr(v) : (fmt === 'pct' ? pct(k.wins[v], k.new_opps[v], 2) : fmtNum(v));
+        const tags = card.querySelectorAll('.compare-tag');
+        const vals = card.querySelectorAll('.compare-value');
+        if (tags[0]) tags[0].textContent = LABEL[a];
+        if (tags[1]) tags[1].textContent = LABEL[b];
+        if (vals[0]) vals[0].textContent = fmt === 'pct' ? pct(k.wins[a], k.new_opps[a], 2) : disp(va);
+        if (vals[1]) vals[1].textContent = fmt === 'pct' ? pct(k.wins[b], k.new_opps[b], 2) : disp(vb);
+        const delta = card.querySelector('[data-cmp-delta]');
+        if (delta && fmt !== 'pct') {
+          const momv = mom(vb, va);
+          delta.textContent = momv.text;
+          delta.className = 'delta ' + momv.cls;
+        }
+      });
+      const ex = document.getElementById('exec-excluded-note');
+      if (ex) ex.innerHTML = `<strong>${fmtNum(k.excluded_opps[b])}</strong> opportunities excluded in <strong>${LABEL[b]}</strong> (Compare B).`;
+      if (MBR.efficiency) {
+        document.querySelectorAll('[data-cmp-eff]').forEach(card => {
+          const key = card.dataset.cmpEff;
+          const fmt = card.dataset.cmpEffFmt || 'num';
+          const ea = MBR.efficiency[a][key], eb = MBR.efficiency[b][key];
+          const disp = (v) => fmt === 'pct' ? v.toFixed(1) + '%' : (fmt === 'dec' ? Number(v).toFixed(1) : fmtNum(v));
+          const tags = card.querySelectorAll('.compare-tag');
+          const vals = card.querySelectorAll('.compare-value');
+          if (tags[0]) tags[0].textContent = LABEL[a];
+          if (tags[1]) tags[1].textContent = LABEL[b];
+          if (vals[0]) vals[0].textContent = disp(ea);
+          if (vals[1]) vals[1].textContent = disp(eb);
+          const delta = card.querySelector('[data-cmp-eff-delta]');
+          if (delta && fmt !== 'pct' && key !== 'flash_pct' && key !== 'data_hygiene_pct') {
+            const momv = mom(eb, ea);
+            delta.textContent = momv.text;
+            delta.className = 'delta ' + momv.cls;
+          }
+        });
+      }
+    }
+
+    function bindFilters() {
+      fillMonthSelects();
+      document.getElementById('useDetailMode')?.addEventListener('click', () => setFilterMode('detail'));
+      document.getElementById('useCompareMode')?.addEventListener('click', () => setFilterMode('compare'));
+      document.getElementById('detailMonth').addEventListener('change', () => setFilterMode('detail'));
+      document.getElementById('compareMonthA').addEventListener('change', () => setFilterMode('compare'));
+      document.getElementById('compareMonthB').addEventListener('change', () => setFilterMode('compare'));
+      setFilterMode('detail');
+    }
+    bindFilters();
+
+    initHourFilter();
+  </script>
+</body>
+</html>
