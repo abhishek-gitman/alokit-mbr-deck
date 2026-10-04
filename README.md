@@ -1,6 +1,8 @@
 # Alokit MBR deck (Apr–Sep 2026)
 
-Interactive monthly business review — open in any browser.
+Interactive monthly business review — open in any browser. 
+
+Current URL- https://abhishek-gitman.github.io/alokit-mbr-deck/ 
 
 **Live site:** after GitHub Pages is enabled, use  
 `https://<your-github-username>.github.io/alokit-mbr-deck/`
